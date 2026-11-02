@@ -34,14 +34,23 @@ class YouTubeFetcher(AbstractFetcher):
             resp_a.raise_for_status()
             items_a = resp_a.json().get("items", [])
 
-            # 2. Fetch News & Politics list (b) (videoCategoryId=25)
+            # 2. Fetch News & Politics list (b) (videoCategoryId=25) with nextPageToken paging
             items_b = []
             try:
                 params_b = dict(base_params)
                 params_b["videoCategoryId"] = "25"
                 resp_b = await client.get(url, params=params_b)
                 if resp_b.status_code == 200:
-                    items_b = resp_b.json().get("items", [])
+                    data_b = resp_b.json()
+                    items_b = data_b.get("items", [])
+                    # Page through category 25 with nextPageToken for richer political coverage
+                    next_token = data_b.get("nextPageToken")
+                    if next_token:
+                        params_b_page2 = dict(params_b)
+                        params_b_page2["pageToken"] = next_token
+                        resp_b2 = await client.get(url, params=params_b_page2)
+                        if resp_b2.status_code == 200:
+                            items_b.extend(resp_b2.json().get("items", []))
                 else:
                     logger.warning(f"[youtube] Category 25 fetch returned HTTP {resp_b.status_code}: {resp_b.text}. Continuing with list (a).")
             except Exception as e:

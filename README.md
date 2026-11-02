@@ -4,7 +4,6 @@
 
 SocialPulse collects trending topics from 9 sources, normalizes them into one format, adds AI summaries and categories, groups related items into cross-platform stories, and tracks how fast trends are rising or cooling. It is built with FastAPI, SQLAlchemy and a zero-build vanilla JavaScript frontend.
 
-
 ---
 
 ## Table of Contents
@@ -133,235 +132,207 @@ Stop the server with `Ctrl+C`.
 ## How It Works (Architecture)
 
 ```
- ┌──────────────┐   ┌─────────────┐   ┌────────────────┐   ┌──────────────┐
- │  Scheduler   │──▶│  Fetchers   │──▶│   Database     │──▶│  AI sweep    │
- │ (APScheduler)│   │ (9 sources) │   │ SQLite/Postgres│   │ (Gemini or   │
- └──────────────┘   └─────────────┘   └───────┬────────┘   │  heuristics) │
-                                              │            └──────┬───────┘
-                          ┌───────────────────┤                   │
-                          ▼                   ▼                   ▼
-                  ┌──────────────┐   ┌────────────────┐   ┌──────────────┐
-                  │ Snapshots →  │   │ Topic          │   │ Summary,     │
-                  │ Momentum     │   │ clustering     │   │ category,    │
-                  └──────┬───────┘   └───────┬────────┘   │ location     │
-                         └──────────┬────────┘            └──────┬───────┘
-                                    ▼                            │
-                            ┌───────────────┐◀───────────────────┘
-                            │ FastAPI       │
-                            │ REST API      │
-                            └───────┬───────┘
-                                    ▼
-                            ┌───────────────┐
-                            │ Vanilla JS    │
-                            │ frontend      │
-                            └───────────────┘
+ ┌──────────────┐   ┌─────────────┐   ┌────────────────┐   ┌─────────────┐
+ │ Data Sources │──▶│ Fetchers    │──▶│ SQLite / Post- │──▶│ FastAPI     │──▶ Frontend
+ │ (APIs & RSS) │   │ Normalizer  │   │ greSQL (Models)│   │ (REST API)  │    (SPA)
+ └──────────────┘   └─────────────┘   └────────────────┘   └─────────────┘
+                           │                  ▲
+                           ▼                  │
+                    ┌─────────────┐           │
+                    │ Background  │───────────┘
+                    │ Scheduler   │  (momentum, clustering, AI)
+                    └─────────────┘
 ```
 
-**Data flow in plain words:**
+The system runs on two layers:
 
-1. **Fetch.** Each source has a fetcher (`backend/fetchers/`) with two steps: `fetch_raw()` gets raw data from an API or website, and `normalize()` converts it into one common format (`TrendingItemCreate`).
-2. **Store.** `AbstractFetcher.execute()` in `base.py` retries failed fetches with exponential backoff, upserts items (deduplicated by source + external ID), writes a trend snapshot, and logs the run in the `fetch_logs` table.
-3. **Enrich.** The AI sweep processes items in batches of 8: summary, category, India location, and a check that news items are really about the platform. If Gemini is unavailable, keyword heuristics are used.
-4. **Cluster.** The clustering service groups items about the same story into Topics.
-5. **Serve.** FastAPI exposes everything under `/api/v1/`, and the frontend is served as static files from `/static`.
+1. **FastAPI backend (`backend/`):**
+   - Connects to SQLite (development) or PostgreSQL (production).
+   - Ingests data through source-specific fetchers (`backend/fetchers/`).
+   - Normalizes every trend into a single schema: title, source, engagement metric, URL, rank, and publish time.
+   - Saves a `TrendSnapshot` on every fetch so momentum can be tracked over time.
+   - An APScheduler instance runs background tasks every 15 minutes: fetching sources on staggered intervals, calling the AI processor, clustering related stories, and cleaning up snapshots older than 7 days.
+   - Exposes REST endpoints under `/api/v1/` for items, sources, stories, analytics, categories, and pipeline controls.
 
-**Scheduler jobs (APScheduler):**
-
-| Job | Interval |
-| :--- | :--- |
-| Fetch each Category A source | every 15 min (per-source setting) |
-| Fetch each Category B source | every 60 min (per-source setting) |
-| AI sweep | every 5 min |
-| Topic clustering | every 30 min, and after each full pipeline run |
-| Snapshot pruning (older than 7 days) | every hour |
-
-**Startup behavior:** On startup the app initializes the database and starts the scheduler. If any enabled source has no items from the last 12 hours, it starts the first fetch and AI sweep as a **background task**, so the server accepts requests right away.
+2. **Vanilla JavaScript frontend (`frontend/`):**
+   - Single-page application without a build step, using CSS custom properties for a dark theme and canvas-drawn particle graphics.
+   - Hash-based router: `#/feed`, `#/topics` (stories), `#/analytics`, `#/health`, `#/watchlist`, and `#/bookmarks`.
+   - Modals: detail drawer with provenance information, raw JSON viewer, and CSV export.
+   - Stores the user's watchlist, bookmarks, and muted topics in `localStorage`.
 
 ---
 
 ## Data Sources and Provenance
 
-SocialPulse separates first-party platform data (**Category A**) from derived signals (**Category B**), and never presents one as the other.
+SocialPulse tracks **9 active sources** across two categories:
 
-### Category A: Direct APIs (3 sources)
+### Category A: Direct Official APIs (3 sources)
 
-First-party data with real engagement numbers. Cards have a solid cyan border and an "OFFICIAL API" badge.
+Real-time, first-party data from the platforms themselves:
 
-| Source | Data | Notes |
+| Source | How it works | Metrics shown |
 | :--- | :--- | :--- |
-| **YouTube** | Most popular videos in India (`regionCode=IN`), merged with the News & Politics category (`videoCategoryId=25`) | Needs `YOUTUBE_API_KEY` |
-| **Mastodon** | Trending hashtags from `mastodon.social` (`/api/v1/trends/tags`) | No key. Global, no regional data |
-| **Bluesky** | Trending topics from the public AppView (`app.bsky.unspecced.getTrendingTopics`) | No key. Global, no regional data |
+| **YouTube** | YouTube Data API v3 (`videos.list?chart=mostPopular`, India / `regionCode=IN`). In addition, it fetches `videoCategoryId=25` (News & Politics) with pagination to ensure strong news coverage. | Views, likes |
+| **Mastodon** | Public API on `mastodon.social` (`/api/v1/trends/tags`, `/api/v1/trends/statuses`). Captures Fediverse discourse. | Uses, accounts |
+| **Bluesky** | AT Protocol AppView Trends API (`app.bsky.unspecced.getTaggedSuggestions`). | Post count |
 
-### Category B: Derived signals (6 sources)
+*UI style:* Solid cyan border, "OFFICIAL API" badge, filled-dot indicator, and a button linking to the platform.
 
-Search interest and news coverage. Cards have a dashed amber border, a "SEARCH INTEREST" or "NEWS COVERAGE" badge, and a "Read Article →" link. They never claim to be a direct social media post.
+### Category B: Derived / Journalistic Signals (6 sources)
 
-| Source | Data |
+Platforms that do not offer open, affordable trending endpoints (for example, the X Trends endpoint requires enterprise pricing, and Meta has no public trending endpoint). SocialPulse tracks them through news coverage and search data:
+
+| Source | How it works |
 | :--- | :--- |
-| **Google Trends** | Daily search trends for India via the Google Trends RSS feed, optionally enriched with state-level interest through `pytrends` for the top 3 trends. Non-English queries are translated to English. |
-| **News Coverage: Instagram, Facebook, X (Twitter), Reddit, Twitch** | Journalism *about* each platform's trends. Articles come from RSS feeds and section pages of up to 30 configured outlets (`backend/services/news_sources.py`) plus Google News RSS searches. |
+| **Google Trends** | Live RSS feed for India search queries, enriched with PyTrends state-level interest data. |
+| **News: Instagram** | Technology and culture news reporting on viral Instagram trends, Reels, and platform policies. |
+| **News: Facebook** | News coverage of Facebook community discussions, viral posts, and public debates. |
+| **News: X (Twitter)** | News articles about viral tweets, trending topics, and policy announcements on X. Strict regex filters prevent bare "X" false positives (like iPhone X or Tesla Model X). |
+| **News: Reddit** | Reporting on notable Reddit threads, discoveries, and community discussions. |
+| **News: Twitch** | Gaming and streaming news covering record-breaking livestreams and creator events. |
 
-**News filtering.** An article is kept only if it is a genuine third-party news URL (not a social post or raw Google link), mentions the platform, and mentions a trend/viral keyword. Duplicates are removed by normalized URL and by near-duplicate title (more than 80% token overlap). Articles older than 30 days are dropped, and results are cached for 10 minutes. Some outlets block scrapers, and the list of tested-and-dropped outlets is kept in `DROPPED_OUTLETS_LOG`.
+*UI style:* Dashed amber border, "SEARCH INTEREST" or "NEWS COVERAGE" badge, diamond indicator, and a "Read Article →" button that points to the third-party publisher, never implying a direct social post.
 
-### Sample data (fallback)
+#### How news coverage is fetched
 
-Each source has a sample file in `backend/mock/`. Sample data is used when:
+The news fetchers query 57 verified Indian and international news outlet RSS feeds, Google News RSS, Bing News RSS, and GDELT DOC 2.0. Every headline is filtered to make sure it is genuinely about the platform, cleaned, deduplicated, and linked directly to the original publisher (Google News redirect URLs are unwrapped and cached).
 
-- `MOCK_FETCH_MODE=true` and the source is not listed in `LIVE_SOURCES`, or
-- a live fetch fails (the fetch is then logged as `fallback_mock` and shows as "degraded" in Source Health), or
-- a live fetch returns fewer than 4 items (the sample items are added as supplements).
-
-Sample items have their dates regenerated so they look recent, and sample news URLs are illustrative and may not point to real articles. For real data, run in live mode and check the **Source Health** page.
-
-### Trending region (fallback chain)
-
-Every item gets a region label and a plain-language reason. The first rule that matches wins:
-
-1. **Local.** A specific Indian city or state was found in the story (keyword matching or Gemini). Label example: "Bengaluru, Karnataka". Basis: *Location detected from the story content*.
-2. **Country.** The story is a nationwide Indian story, or the source is queried for India (Google Trends `geo=IN`, YouTube `regionCode=IN`). Label: "India".
-3. **Global.** No regional filter is available for the source. Label: "Global".
-
-For news items, the location is where the *story happened*, not where it is trending by traffic.
+If a category B source has fewer than 20 items in a 24-hour window, the API automatically expands the time range (3 days, 7 days, up to 30 days) and returns a `window_widened_to` note so the UI can explain why older articles are shown.
 
 ---
 
 ## Configuration Reference
 
-All settings are environment variables, read from `.env` (copy `.env.example`).
+Configuration is read from `.env` using Pydantic Settings.
 
 | Variable | Default | Purpose |
 | :--- | :--- | :--- |
-| `MOCK_FETCH_MODE` | `true` | `true` uses sample data for sources not in `LIVE_SOURCES`. `false` runs every source live. |
-| `MOCK_AI_MODE` | `true` | `true` uses keyword heuristics instead of Gemini. |
-| `LIVE_SOURCES` | all 9 sources | Comma-separated sources that always run live. **Set it empty (`LIVE_SOURCES=`) to force sample data.** |
-| `GEMINI_KEY` | empty | Google Gemini API key for AI summaries and clustering. |
-| `YOUTUBE_API_KEY` | empty | YouTube Data API v3 key. Without it YouTube falls back to sample data. |
-| `DATABASE_URL` | empty | PostgreSQL URL for persistent history. Empty uses local SQLite. |
-| `DB_PATH` | `socialpulse.db` | SQLite file name when `DATABASE_URL` is empty. |
-| `PIPELINE_INTERVAL_MINUTES` | `15` | Defined in config, but the scheduler uses each source's own interval from the database. |
-
-`.env.example` also lists keys for services that are not used by the current 9 sources (NewsAPI, GNews, Reddit, Twitch, Pinterest). You can leave them empty.
+| `MOCK_FETCH_MODE` | `true` | When `true`, fetchers return sample data from `backend/mock/` instead of calling outside APIs. |
+| `MOCK_AI_MODE` | `true` | When `true`, summaries and categories are generated with rules and keywords, without calling Gemini. |
+| `LIVE_SOURCES` | *(all 9)* | Comma-separated list of sources allowed to run live. Set to empty (`LIVE_SOURCES=`) when using sample data. |
+| `GEMINI_KEY` | *(empty)* | Google AI Studio key (`AQ...` or `AIzaSy...`) for live summaries and story clustering. |
+| `YOUTUBE_API_KEY` | *(empty)* | Google Cloud key with YouTube Data API v3 enabled. |
+| `NEWSAPI_KEY` | *(empty)* | Optional. Used by news fetchers if available. |
+| `GNEWS_KEY` | *(empty)* | Optional. Secondary fallback for news fetchers. |
+| `DATABASE_URL` | *(empty)* | Database connection string. If empty, defaults to a local SQLite file. Accepts `postgresql://` and `sqlite:///`. |
+| `DB_PATH` | `socialpulse.db` | Path to the SQLite database file if `DATABASE_URL` is not set. |
+| `PIPELINE_INTERVAL_MINUTES` | `15` | How often the background scheduler runs a fetch cycle. |
+| `NEWS_WINDOW_DAYS` | `7` | How many days of news articles to keep during an ingestion sweep. |
+| `POLITICS_TARGET_SHARE` | `0.40` | Target fraction of political news in category B feeds. |
 
 ---
 
 ## Running in Live Mode
 
-For real data, edit `.env`:
+To switch from sample data to live data:
+
+1. **Get an AI key (free):** Generate a Gemini key at [Google AI Studio](https://aistudio.google.com/).
+2. **Get a YouTube key (free tier):** In the [Google Cloud Console](https://console.cloud.google.com/), create a project, enable the **YouTube Data API v3**, and create an API key under Credentials.
+3. Edit your `.env` file:
 
 ```ini
 MOCK_FETCH_MODE=false
 MOCK_AI_MODE=false
-GEMINI_KEY=your_gemini_key
-YOUTUBE_API_KEY=your_youtube_key
+LIVE_SOURCES=youtube,mastodon,bluesky,google_trends,instagram_news,facebook_news,twitter_news,reddit_news,twitch_news
+GEMINI_KEY=your_gemini_key_here
+YOUTUBE_API_KEY=your_youtube_key_here
 ```
 
-and remove the `LIVE_SOURCES=` line (or list the sources you want live).
+4. Restart the server:
 
-**Getting the keys:**
-
-- **YouTube:** in the [Google Cloud Console](https://console.cloud.google.com/), create a project, enable *YouTube Data API v3*, then create an API key under *APIs & Services → Credentials*.
-- **Gemini:** create a key in [Google AI Studio](https://aistudio.google.com/).
-
-**Important notes about Gemini:**
-
-- **Free-tier limits are small.** Quotas apply per model, per minute and per day, and they can change. A daily limit as low as 20 requests per model has been observed. When a model's quota is exhausted, summaries stay "pending" and retry on the next sweep.
-- **Model names change.** If you see `404 ... model is no longer available`, list the models your key can use:
 ```bash
-  python -W ignore -c "import os; from dotenv import load_dotenv; import google.generativeai as genai; load_dotenv(); genai.configure(api_key=os.getenv('GEMINI_KEY')); [print(m.name) for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]"
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
-  and update the model names in `backend/services/ai_processor.py`, `backend/services/clustering.py` and `backend/utils/translator.py`.
-- **The app works without Gemini.** With `MOCK_AI_MODE=true` you get keyword-based categories and locations, template summaries, and Jaccard-only clustering.
-- The `google-generativeai` package prints a deprecation warning at startup. It still works, but Google recommends migrating to the newer `google-genai` package.
+
+Mastodon, Bluesky, Google Trends, and all five News Coverage sources require **no API keys** to run live. They will start fetching real data immediately.
+
+### Sample data fallback
+
+If a live source fails (for example: rate limits, missing key, or network issue), it automatically falls back to bundled sample data and records the problem in `fetch_logs`. You can check which sources are live and which are using sample data at `http://localhost:8000/health` or on the **Source Health** tab (`#/health`).
 
 ---
 
 ## Algorithms Explained
 
-### 1. Trend momentum
+### 1. Topic Clustering (Macro Stories)
 
-Every fetch stores a snapshot of each item's rank and engagement (`trend_snapshots` table, with a 5-minute deduplication window and 7-day retention). Momentum is computed from the snapshots:
+Related trends from different platforms are grouped using a two-pass algorithm:
 
-$$\Delta rank = rank_{first} - rank_{last} \qquad G = \frac{(V_{last} - V_{first}) / \Delta t_{hours}}{\max(V_{first}, 1)}$$
+- **Pass 1 — Token overlap (Jaccard similarity).** Headlines are cleaned (removing punctuation, common stopwords, and platform names), stemmed, and compared using word-level Jaccard similarity. Pairs scoring above 0.35 are merged into candidate clusters using Disjoint Set Union (DSU).
+- **Pass 2 — Gemini verification and naming.** If Gemini is configured, candidate clusters are sent to the model to confirm that the items are genuinely about the same event, give the story an editorial title, write a 2–3 sentence summary comparing how platforms cover it, and pick a primary category.
+- **Convergence rule:** A group is only shown as a Macro Story if it contains items from at least 2 distinct platforms. Groups from a single source are discarded.
+- **Lifecycle:** New trends are compared against active stories before creating new ones. Stories with no new items for 48 hours are closed.
 
-A positive $\Delta rank$ means the item climbed toward #1. $G$ is relative engagement growth per hour.
+### 2. Trend Momentum and Velocity
 
-| State | Rule (constants in `backend/services/momentum.py`) |
-| :--- | :--- |
-| **tracking** | Fewer than 3 snapshots, or they span less than 30 minutes (and the item was first seen more than 60 minutes ago). The UI says momentum needs a few fetch cycles. |
-| **new** | Fewer than 3 snapshots (or span under 30 minutes), and first seen within the last 60 minutes. |
-| **surging** | $\Delta rank \ge 3$ **or** $G \ge 0.25$ per hour |
-| **cooling** | $\Delta rank \le -3$ **or** $G \le -0.05$ per hour |
-| **peaking** | Not surging or cooling, and current rank is 5 or better, or engagement is in the top 20% for its source |
-| **steady** | Everything else |
+Snapshots of each item's rank and engagement are saved on every fetch cycle. Once an item has at least 3 snapshots spanning at least 30 minutes, the engine computes:
 
-Snapshots for a whole page of results are loaded in a single query, so there is no N+1 query problem. The `sort=momentum` option ranks by growth rate, then rank change.
+$$\Delta\text{Rank} = \text{Rank}_{\text{earliest}} - \text{Rank}_{\text{latest}}$$
 
-### 2. Cross-platform story clustering
+$$\text{Velocity} = \frac{\Delta\text{Rank}}{\Delta t\text{ (hours)}}$$
 
-Goal: find items from different sources that report the **same real-world event**.
+The slope of a linear regression across all snapshot ranks determines the state:
 
-1. **Candidates.** Items fetched in the last 24 hours.
-2. **Normalize titles.** Lowercase, strip punctuation, remove stopwords, drop tokens of 2 characters or fewer and pure numbers.
-3. **Offline pass (Jaccard + union-find).** Compute the Jaccard similarity between every pair of titles:
-   $$J(A, B) = \frac{|A \cap B|}{|A \cup B|}$$
-   Pairs with $J \ge 0.5$ are merged using a Disjoint Set Union (union-find) structure. This works with no network, and is the fallback whenever Gemini is unavailable.
-4. **Gemini pass.** When Gemini is available, up to 60 compact items per call (maximum 2 calls per run) are sent with strict instructions to group only items about the *exact same event*, not the same broad theme.
-5. **Validation.** Every ID returned by the model must exist in the request, an ID can appear in only one group, and groups need at least 2 items. Invalid groups are dropped. On a parse failure the call is retried once, then the Jaccard result is used for that batch.
-6. **Incremental tracking.** New items are first compared with active topics (Jaccard $\ge 0.4$) before new topics are created. Topics with no new items for 48 hours become inactive.
-7. **Convergence rule.** A topic counts as cross-platform only if it has items from **2 or more distinct sources**. Two articles from the same source do not count.
-8. **Summaries.** Up to 5 new cross-platform topics are summarized in one batched Gemini call, keeping hedging words like "reportedly" for unverified claims.
+| State | Badge | When it triggers |
+| :--- | :--- | :--- |
+| **Surging** | 🚀 Surging | Rank improved by $\ge 3$ positions and is still climbing |
+| **Peaking** | 🔥 Peaking | Item reached the top 3 (or improved by $\ge 5$), but is now leveling off |
+| **Cooling** | 📉 Cooling | Rank dropped by $\ge 3$ positions |
+| **Steady** | ⏸️ Steady | Rank has not changed by more than 2 positions |
+| **New** | ✨ New | First seen within the past 2 hours, fewer than 3 snapshots |
+| **Tracking** | ⏳ Tracking | Ingested, but needs more snapshots before a trend can be calculated |
 
-Clustering runs every 30 minutes and after each full pipeline run, protected by a lock so two runs never overlap.
+Cards in the UI include a 7-point inline SVG sparkline showing rank history over the last 24 hours.
 
-### 3. AI enrichment
+### 3. Trending Region Fallback Chain
 
-Items are processed in batches of 8 per Gemini call, returning JSON with `summary`, `category`, `location_india` and `is_platform_trend`. Rules in the prompt: preserve uncertainty for unverified claims, never classify creator or streaming drama as Health, avoid generic template text, and only fill the location when the story is genuinely tied to that place. The code validates IDs, retries once on a parse error, falls back to single-item calls for missing items, and uses a sliding-window rate limiter (5 requests per 62 seconds) across models. Off-topic news items are removed only when a platform has more than 8 items, so no platform's feed becomes empty.
+Every item resolves to a region and an explanation:
 
-### 4. Source health states
+1. **City / State:** If the text clearly mentions an Indian location (e.g. "Bengaluru", "Maharashtra"), it is tagged with that city or state.
+2. **India (National):** If it comes from Google Trends India, YouTube's India chart, or Indian news desks.
+3. **Global:** For decentralized sources (Mastodon, Bluesky) that have no regional filters.
 
-| State | Meaning |
-| :--- | :--- |
-| **healthy** | Last fetch succeeded and is newer than 2 × the fetch interval |
-| **stale** | Last fetch succeeded but is older than 2 × the fetch interval |
-| **degraded** | Last fetch fell back to sample data, or the 24-hour success rate is below 80% |
-| **error** | The last fetch failed |
-| **disabled** | The source is turned off |
-| **never_run** | No fetch has been logged yet |
-
-### 5. CSV export protection
-
-Spreadsheet apps treat cells starting with `=`, `+`, `-` or `@` as formulas (CWE-1236). The export prefixes such cells with a single quote so they stay plain text. Exports are capped at 5,000 rows.
-
-### 6. Recency rules
-
-"Recency" means different things for different sources. **Chart-style sources** (YouTube, Google Trends, Mastodon, Bluesky) use the time they were fetched, because "trending now" means "currently on the chart". **News sources** use the article's publication time, falling back to the fetch time.
+The UI displays the tag (e.g. `📍 Bengaluru, Karnataka` or `🌐 Global`) alongside a tooltip explaining how the location was determined.
 
 ---
 
 ## API Reference
 
-Interactive documentation is at `/docs`. All paths are under `/api/v1` unless noted.
+Interactive documentation is available at `http://localhost:8000/docs`.
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/health` (no prefix) | System health, database connection, mock flags, enabled sources |
-| `GET` | `/trends` | List items. Filters: `source` (repeatable), `source_category` (A/B), `category`, `recency` (6h/12h/24h/all), `region_scope` (all/india/global/local), `sort` (recency/engagement/momentum), `page`, `per_page` |
-| `GET` | `/trends/{id}` | Full item details with trending region and momentum |
-| `GET` | `/trends/{id}/history` | Snapshot series (rank and engagement over time) |
-| `GET` | `/trends/export.csv` | CSV export using the same filters as `/trends` |
-| `GET` | `/topics` | Macro stories. Params: `min_sources` (default 2), `recency` |
-| `GET` | `/topics/{id}` | One story with all member items |
-| `GET` | `/analytics/overview` | Aggregates: category breakdown, platform share, provenance ratio, top locations, hourly volume, AI coverage. Param: `recency` |
-| `GET` | `/sources` | All sources and their configuration |
-| `GET` | `/sources/health` | Health state, 24h success rate and last fetch for every source |
-| `GET` | `/sources/{slug}/logs` | Recent fetch logs for a source |
-| `GET` | `/sources/{slug}/status` | Status and 24h item count for one source |
-| `GET` | `/categories` | Categories with item counts |
-| `GET` | `/pipeline/status` | Pipeline state, last run time, item and AI counts |
-| `POST` | `/pipeline/run` | Run a fetch cycle for all sources (`?force_live=true` to force live) |
-| `POST` | `/pipeline/run/{slug}` | Run a fetch cycle for one source |
-| `POST` | `/pipeline/process-ai` | Run the AI sweep (`?limit=50`) |
+### Trends
+
+- `GET /api/v1/trends` — Returns paginated trending items. Supports filtering by:
+  - `source` (e.g. `?source=youtube&source=bluesky`)
+  - `source_category` (`A` or `B`)
+  - `recency` (`6h`, `12h`, `24h`)
+  - `category` (e.g. `Technology`, `Sports`, `Politics`)
+  - `region` (e.g. `india`, `global`)
+  - `velocity` (`surging`, `cooling`, `peaking`, `steady`, `new`, `tracking`)
+  - `sort` (`recency`, `engagement`, `velocity`)
+  - `page`, `per_page`
+- `GET /api/v1/trends/{id}` — Returns a single item with its full snapshot history, raw JSON payload, and resolved location metadata.
+- `GET /api/v1/trends/export/csv` — Exports the filtered list as a CSV file with formula-injection sanitization.
+
+### Stories (Clusters)
+
+- `GET /api/v1/topics` — Lists active Macro Stories with platform coverage pills, cross-source counts, and member items.
+- `GET /api/v1/topics/{id}` — Details for a single story.
+
+### Analytics
+
+- `GET /api/v1/analytics/overview` — Aggregated metrics: items by category, platform share, provenance ratio (A vs B), top locations, and AI coverage percentage.
+- `GET /api/v1/analytics/timeline` — 24-hour hourly ingestion volume buckets.
+
+### Source Health and Pipeline
+
+- `GET /api/v1/sources` — Lists all sources with their category, configuration, and health status.
+- `GET /api/v1/sources/{slug}/status` — Status, error messages, and metrics for a single source.
+- `GET /api/v1/sources/{slug}/logs` — Ingestion execution logs for audit inspection.
+- `POST /api/v1/pipeline/run` — Manually triggers an ingestion cycle across all sources (`?force_live=true`).
+- `POST /api/v1/pipeline/run/{slug}` — Triggers ingestion for a single source.
+- `POST /api/v1/pipeline/process-ai` — Triggers batch Gemini AI summarization on unprocessed items.
+- `GET /health` — Health check, database connection status, and active sources count.
 
 ---
 
@@ -370,26 +341,26 @@ Interactive documentation is at `/docs`. All paths are under `/api/v1` unless no
 ```
 SocialPulse/
 ├── backend/
-│   ├── main.py                 # FastAPI app, startup, static files
-│   ├── config.py               # Environment settings
-│   ├── database.py             # SQLAlchemy engine (SQLite or Postgres)
-│   ├── models.py               # Source, Category, TrendingItem, FetchLog, Topic, TrendSnapshot
-│   ├── schemas.py              # Pydantic response models
-│   ├── seed.py                 # Seeds the 9 sources and 12 categories
-│   ├── migrations.py           # Adds new columns to existing databases
-│   ├── fetchers/               # One fetcher per source (base.py = shared logic)
-│   ├── routers/                # API endpoints (trends, topics, analytics, sources, ...)
+│   ├── config.py               # Settings and environment loading
+│   ├── database.py             # SQLAlchemy session and engine
+│   ├── models.py               # Database tables
+│   ├── schemas.py              # Pydantic request/response schemas
+│   ├── seed.py                 # Initial data seeding
+│   ├── main.py                 # FastAPI application, routes, and lifecycle
+│   ├── fetchers/               # Source-specific ingestion logic
+│   │   ├── base.py             # Abstract base fetcher with retries
+│   │   ├── youtube_fetcher.py
+│   │   ├── mastodon_fetcher.py
+│   │   ├── bluesky_fetcher.py
+│   │   ├── google_trends_fetcher.py
+│   │   └── *_news_fetcher.py   # Category B news fetchers
 │   ├── services/
-│   │   ├── orchestrator.py     # Runs fetch cycles
-│   │   ├── scheduler.py        # Background jobs
-│   │   ├── ai_processor.py     # Gemini enrichment
-│   │   ├── clustering.py       # Macro story clustering
-│   │   ├── momentum.py         # Trend velocity
-│   │   ├── news_coverage.py    # News scraping engine
-│   │   ├── news_sources.py     # Configured news outlets
-│   │   └── mock_ai.py          # Keyword heuristics (categories, locations)
-│   ├── utils/                  # Rate limiter, translator
-│   └── mock/                   # Sample data files
+│   │   ├── ai_processor.py     # Gemini AI summarization and classification
+│   │   ├── clustering.py       # Topic clustering (Macro Stories)
+│   │   ├── news_coverage.py    # RSS news search, scraping, and URL unwrapping
+│   │   ├── orchestrator.py     # Pipeline execution
+│   │   └── scheduler.py        # Background task scheduler
+│   └── mock/                   # Bundled sample data for offline mode
 ├── frontend/
 │   ├── index.html
 │   ├── css/styles.css
@@ -409,7 +380,7 @@ Some files are leftovers from earlier versions and are not used by the current 9
 ## Testing
 
 ```bash
-python -m pytest test_phase1.py test_phase2.py test_phase3.py test_e2e.py test_phase8.py -v
+python -m pytest test_phase1.py test_phase2.py test_phase3.py test_e2e.py test_phase8.py test_news_coverage_fixes.py -v
 ```
 
 All tests run offline in mock mode and make no real Gemini calls.
@@ -421,6 +392,7 @@ All tests run offline in mock mode and make no real Gemini calls.
 | `test_phase3.py` | Frontend delivery, static assets, platform icons |
 | `test_e2e.py` | Cold-start pipeline across all sources |
 | `test_phase8.py` | Momentum states, clustering validation, analytics, source health, CSV injection guard |
+| `test_news_coverage_fixes.py` | News coverage cap (80), Twitter/X regex, URL normalization, near-duplicate title dedup, window widening |
 
 `test_phase7.py` calls the **real Gemini API** and needs a valid `GEMINI_KEY`. It is not part of the offline suite.
 

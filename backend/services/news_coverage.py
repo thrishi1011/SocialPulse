@@ -1,3 +1,4 @@
+import urllib.parse
 import asyncio
 import calendar
 from datetime import datetime, timedelta
@@ -12,7 +13,8 @@ import feedparser
 import googlenewsdecoder
 from bs4 import BeautifulSoup
 
-from backend.services.news_sources import NEWS_OUTLETS, DROPPED_OUTLETS_LOG
+from backend.services.news_sources import NEWS_OUTLETS, DROPPED_OUTLETS_LOG, DROPPED_OUTLETS_DOMAINS
+from backend.config import settings
 
 logger = logging.getLogger("socialpulse.news_coverage")
 
@@ -34,60 +36,156 @@ HEADERS = {
 # 10-minute in-memory cache to avoid hammering sites on repeated refreshes
 _scrape_cache: dict[str, tuple[float, list[dict]]] = {}
 CACHE_TTL_SECONDS = 600
+MAX_ARTICLES_PER_PLATFORM = 80
+
+# Google News decoded URL cache & concurrency limiter
+_url_decode_cache: dict[str, str] = {}
+_decode_semaphore = asyncio.Semaphore(4)
 
 # Shared concurrency semaphore for courteous scraping
 _shared_semaphore = asyncio.Semaphore(8)
 
-# Query variants per platform (4-6 variants, with and without India)
+# 18-20 rich query variants per platform (covering India and global; viral, trend, ban, backlash, creator, policy, and politics)
 PLATFORM_QUERIES: dict[str, list[str]] = {
     "Instagram": [
         '"Instagram" trending viral',
         '"Instagram" reel viral India',
         '"Instagram" update creator trends',
         '"Instagram" backlash trend',
-        '"Instagram trend" India'
+        '"Instagram trend" India',
+        '"Instagram" political campaign ads India',
+        '"Instagram" minister speech reel viral',
+        '"Instagram" deepfake video viral election',
+        '"Instagram" IT rules compliance notice',
+        '"Instagram" protest video viral India',
+        '"Instagram" account ban suspended controversy',
+        '"Instagram" influencer controversy viral',
+        '"Instagram" government takedown order',
+        '"Instagram" algorithm change creator outcry',
+        '"Instagram" meme trend viral debate',
+        '"Instagram" viral challenge warning',
+        '"Instagram" party election campaign viral',
+        '"Instagram" court notice digital safety'
     ],
     "Facebook": [
         '"Facebook" viral post trend',
         '"Facebook" viral debate India',
         '"Facebook" community trend viral',
         '"Facebook" Meta controversy trend',
-        '"Facebook" post sparks reaction India'
+        '"Facebook" post sparks reaction India',
+        '"Facebook" political ads election India',
+        '"Facebook" post sparks political row',
+        '"Facebook" minister post viral debate',
+        '"Facebook" government takedown notice',
+        '"Facebook" misinformation fact check viral',
+        '"Facebook" deepfake political ad debate',
+        '"Facebook" party campaign IT cell trend',
+        '"Facebook" hate speech moderation row',
+        '"Facebook" user protest viral campaign',
+        '"Facebook" court notice algorithmic bias',
+        '"Facebook" live stream viral controversy',
+        '"Facebook" post case FIR registered India',
+        '"Facebook" community standards ban trend'
     ],
     "Twitter": [
         '"Twitter" trending India viral',
         '"X" trending "on X" viral',
         '"Elon Musk" X trend debate',
         '"X users" trend backlash',
-        '"viral tweet" trend reaction India'
+        '"viral tweet" trend reaction India',
+        '"on X" political controversy India',
+        '"tweeted" minister speech viral debate',
+        '"on X" election campaign misinformation',
+        '"X account" suspended government order',
+        '"X" IT ministry notice blocking accounts',
+        '"X" deepfake viral video debate',
+        '"X spaces" political debate viral',
+        '"tweet sparks" political row India',
+        '"X algorithm" political bias debate',
+        '"on X" protest hashtag trending',
+        '"X post" fact check viral backlash',
+        '"Twitter handle" official statement controversy',
+        '"on X" opposition leader post viral'
     ],
     "X (Twitter)": [
         '"Twitter" trending India viral',
         '"X" trending "on X" viral',
         '"Elon Musk" X trend debate',
         '"X users" trend backlash',
-        '"viral tweet" trend reaction India'
+        '"viral tweet" trend reaction India',
+        '"on X" political controversy India',
+        '"tweeted" minister speech viral debate',
+        '"on X" election campaign misinformation',
+        '"X account" suspended government order',
+        '"X" IT ministry notice blocking accounts',
+        '"X" deepfake viral video debate',
+        '"X spaces" political debate viral',
+        '"tweet sparks" political row India',
+        '"X algorithm" political bias debate',
+        '"on X" protest hashtag trending',
+        '"X post" fact check viral backlash',
+        '"Twitter handle" official statement controversy',
+        '"on X" opposition leader post viral'
     ],
     "X": [
         '"Twitter" trending India viral',
         '"X" trending "on X" viral',
         '"Elon Musk" X trend debate',
         '"X users" trend backlash',
-        '"viral tweet" trend reaction India'
+        '"viral tweet" trend reaction India',
+        '"on X" political controversy India',
+        '"tweeted" minister speech viral debate',
+        '"on X" election campaign misinformation',
+        '"X account" suspended government order',
+        '"X" IT ministry notice blocking accounts',
+        '"X" deepfake viral video debate',
+        '"X spaces" political debate viral',
+        '"tweet sparks" political row India',
+        '"X algorithm" political bias debate',
+        '"on X" protest hashtag trending',
+        '"X post" fact check viral backlash',
+        '"Twitter handle" official statement controversy',
+        '"on X" opposition leader post viral'
     ],
     "Reddit": [
-        '"Reddit" viral post debate',
-        '"Reddit" thread sparks viral India',
-        '"Reddit" community trend discussion',
-        '"Reddit users" react viral',
-        '"trending on Reddit"'
+        "Reddit trending",
+        "Reddit viral",
+        "Reddit post debate",
+        "Reddit thread India",
+        "Reddit user viral",
+        "Reddit controversy trend",
+        "Reddit community reaction",
+        "Reddit political debate India",
+        "subreddit r/india viral discussion",
+        "Reddit election discussion",
+        "Reddit minister speech reaction",
+        "Reddit IT policy debate",
+        "Reddit protest campaign",
+        "Reddit boycott controversy",
+        "Reddit scam expose viral",
+        "Reddit tech layoff discussion",
+        "Reddit moderator policy backlash",
+        "trending on Reddit discussion"
     ],
     "Twitch": [
         '"Twitch" streamer viral drama',
         '"Twitch" stream trend record',
         '"Twitch" esports gaming tournament viral',
         '"Twitch streamer" controversy ban',
-        '"Twitch livestream" reaction viral'
+        '"Twitch livestream" reaction viral',
+        '"Twitch" platform policy update backlash',
+        '"Twitch streamer" charity stream record',
+        '"Twitch" DMCA copyright strike drama',
+        '"Twitch" streamer boycott protest',
+        '"Twitch" gambling ban policy controversy',
+        '"Twitch" creator payout revenue split row',
+        '"Twitch" live stream swatting incident',
+        '"Twitch" gaming controversy viral',
+        '"Twitch streamer" political debate stream',
+        '"Twitch" India gaming creator stream',
+        '"Twitch" community guidelines update trend',
+        '"Twitch" subathon record viral stream',
+        '"Twitch" streamer suspended apology'
     ]
 }
 
@@ -148,7 +246,14 @@ def is_topically_relevant(title: str, snippet: str, platform_name: str) -> bool:
     """
     text = f"{title} {snippet}"
     if platform_name in ["Twitter", "X (Twitter)", "X"]:
-        pattern = r"\b(x|twitter|tweet|tweets|retweet|elon musk|on x)\b"
+        # Guard against bare 'x' (e.g. Model X, iPhone X, Generation X). Require explicit context.
+        pattern = (
+            r"\b(twitter|tweet|tweets|retweet|retweeted|elon musk)\b|"
+            r"\bon x\b|"
+            r"\bx\s*\((?:formerly\s*)?twitter\)|"
+            r"\bx\s*(?:users?|posts?|feed|handle|account|platform|spaces|algorithm|community|bans?|blocking|subscribers?)\b|"
+            r"\b(?:posted|trending|viral|shared)\s+on\s+x\b"
+        )
     elif platform_name == "Instagram":
         pattern = r"\b(instagram|insta|reel|reels|ig|meta)\b"
     elif platform_name == "Facebook":
@@ -167,7 +272,9 @@ def is_topically_relevant(title: str, snippet: str, platform_name: str) -> bool:
         r"\b(trend|trending|viral|buzz|sparks?|debates?|reacts?|reaction|outcry|backlash|"
         r"video|clip|post|views?|challenge|shares?|internet|online|broadcast|record|ban|bans|"
         r"feature|algorithm|millions?|stars?|interview|fans?|community|discussions?|lawsuit|"
-        r"terms|feed|grid|update|notes?|creator|drama|stream|boycott)\b"
+        r"terms|feed|grid|update|notes?|creator|drama|stream|boycott|"
+        r"politics|political|election|elections|minister|government|court|order|misinformation|"
+        r"deepfake|notice|rule|rules|campaign|parliament|congress|bjp|banned|blocked|fir)\b"
     )
     return bool(re.search(trend_pattern, text, re.IGNORECASE))
 
@@ -177,23 +284,34 @@ def generate_news_article_id(url: str) -> str:
     return hashlib.sha256(clean_url.encode("utf-8")).hexdigest()[:32]
 
 def _sync_decode_url(raw_url: str) -> str:
-    try:
-        clean = raw_url.split("?")[0] if "?" in raw_url else raw_url
-        res = googlenewsdecoder.new_decoderv1(clean, interval=0.1)
-        if isinstance(res, dict) and res.get("status") and res.get("decoded_url"):
-            return res["decoded_url"]
-    except Exception:
-        pass
-    return raw_url
+    if raw_url in _url_decode_cache:
+        return _url_decode_cache[raw_url]
+    clean = raw_url.split("?")[0] if "?" in raw_url else raw_url
+    for attempt in range(2):
+        try:
+            res = googlenewsdecoder.new_decoderv1(clean, interval=0.1)
+            if isinstance(res, dict) and res.get("status") and res.get("decoded_url"):
+                decoded = res["decoded_url"]
+                if decoded and "news.google.com" not in decoded.lower():
+                    _url_decode_cache[raw_url] = decoded
+                    return decoded
+        except Exception:
+            if attempt == 0:
+                time.sleep(0.15)
+    return ""
 
 async def decode_url_safe(raw_url: str) -> str:
-    """Decode Google News redirect URL to direct publisher link with 8.0s timeout."""
+    """Decode Google News redirect URL to direct publisher link with caching, retry, and semaphore(4)."""
     if "/articles/" not in raw_url:
         return raw_url
-    try:
-        return await asyncio.wait_for(asyncio.to_thread(_sync_decode_url, raw_url), timeout=8.0)
-    except Exception:
-        return raw_url
+    if raw_url in _url_decode_cache:
+        return _url_decode_cache[raw_url]
+    async with _decode_semaphore:
+        try:
+            decoded = await asyncio.wait_for(asyncio.to_thread(_sync_decode_url, raw_url), timeout=6.0)
+            return decoded or ""
+        except Exception:
+            return ""
 
 def parse_entry_datetime(entry: Any) -> datetime | None:
     """Extract true publication timestamp from RSS entry metadata."""
@@ -265,7 +383,7 @@ async def _fetch_from_outlet(
                 resp = await client.get(rss_url, timeout=6.0)
             if resp.status_code == 200:
                 feed = feedparser.parse(resp.text)
-                for entry in feed.entries[:25]:
+                for entry in feed.entries[:60]:
                     stats[outlet_name]["found"] += 1
                     raw_title = entry.title if hasattr(entry, "title") else ""
                     clean_title = re.sub(r"\s+", " ", raw_title).strip()
@@ -304,7 +422,8 @@ async def _fetch_from_outlet(
                         "content": clean_title[:200]
                     })
                     stats[outlet_name]["kept"] += 1
-                return articles
+                if articles:
+                    return articles
         except Exception as e:
             logger.debug(f"RSS fetch failed for {outlet_name}: {e}")
 
@@ -419,16 +538,19 @@ async def _fetch_single_google_query(
     outlet_key: str,
     stats: dict[str, dict[str, int]]
 ) -> list[dict]:
-    clean_q = q.strip().replace('"', '%22').replace(" ", "+")
-    rss_url = f"https://news.google.com/rss/search?q={clean_q}"
+    query_str = q.strip()
+    if "when:" not in query_str:
+        query_str = f"{query_str} when:7d"
+    encoded_q = urllib.parse.quote_plus(query_str)
+    rss_url = f"https://news.google.com/rss/search?q={encoded_q}&hl=en-IN&gl=IN&ceid=IN:en"
     try:
         async with _shared_semaphore:
-            resp = await client.get(rss_url, timeout=5.0)
+            resp = await client.get(rss_url, timeout=7.0)
         if resp.status_code != 200:
             return []
         feed = feedparser.parse(resp.text)
         decoded_items = []
-        for entry in feed.entries[:3]:
+        for entry in feed.entries[:40]:
             item = await _decode_google_entry(entry, platform_name, outlet_key, stats)
             if item:
                 decoded_items.append(item)
@@ -448,15 +570,247 @@ async def _fetch_from_google_news(
     if outlet_key not in stats:
         stats[outlet_key] = {"found": 0, "kept": 0, "failed": 0}
 
+    # Run top 10 query variants to ensure broad coverage while respecting latency
     tasks = [
         _fetch_single_google_query(client, q, platform_name, outlet_key, stats)
-        for q in query_variants
+        for q in query_variants[:10]
     ]
     query_results = await asyncio.gather(*tasks, return_exceptions=True)
     articles = []
     for q_res in query_results:
         if isinstance(q_res, list):
             articles.extend(q_res)
+    return articles
+
+async def _fetch_from_bing_news(
+    client: httpx.AsyncClient,
+    platform_name: str,
+    query_variants: list[str],
+    stats: dict[str, dict[str, int]]
+) -> list[dict]:
+    """Fetch candidate articles from Bing News RSS with direct URL unwrapping."""
+    outlet_key = "Bing News RSS"
+    if outlet_key not in stats:
+        stats[outlet_key] = {"found": 0, "kept": 0, "failed": 0}
+
+    articles: list[dict] = []
+    selected_queries = query_variants[:6]
+
+    async def _fetch_bing_q(q: str) -> list[dict]:
+        items = []
+        encoded_q = urllib.parse.quote_plus(q)
+        bing_url = f"https://www.bing.com/news/search?q={encoded_q}&format=rss&cc=IN"
+        try:
+            async with _shared_semaphore:
+                resp = await client.get(bing_url, timeout=6.0)
+            if resp.status_code != 200:
+                return []
+            feed = feedparser.parse(resp.text)
+            for entry in feed.entries:
+                stats[outlet_key]["found"] += 1
+                raw_link = getattr(entry, "link", None)
+                if not raw_link:
+                    stats[outlet_key]["failed"] += 1
+                    continue
+
+                target_url = raw_link
+                try:
+                    parsed_qs = urllib.parse.parse_qs(urllib.parse.urlparse(raw_link).query)
+                    if "url" in parsed_qs and parsed_qs["url"]:
+                        target_url = parsed_qs["url"][0]
+                except Exception:
+                    pass
+
+                outlet_name = getattr(entry, "news_source", None) or "Bing News"
+                raw_title = getattr(entry, "title", "")
+                clean_title = re.sub(r"\s+", " ", raw_title).strip()
+                if " - " in clean_title and outlet_name == "Bing News":
+                    parts = clean_title.rsplit(" - ", 1)
+                    clean_title = parts[0].strip()
+                    outlet_name = parts[1].strip()
+
+                if not is_valid_news_article(target_url, outlet_name):
+                    stats[outlet_key]["failed"] += 1
+                    continue
+
+                summary = getattr(entry, "summary", "") or ""
+                clean_summary = BeautifulSoup(summary, "html.parser").get_text(strip=True)
+                if not is_topically_relevant(clean_title, clean_summary, platform_name):
+                    stats[outlet_key]["failed"] += 1
+                    continue
+
+                pub_dt = parse_entry_datetime(entry)
+                if pub_dt and (datetime.utcnow() - pub_dt) > timedelta(days=30):
+                    stats[outlet_key]["failed"] += 1
+                    continue
+
+                items.append({
+                    "source": {"name": outlet_name},
+                    "author": f"via {outlet_name}",
+                    "title": clean_title,
+                    "description": clean_summary[:400] if clean_summary else f"News report from {outlet_name} covering {platform_name} trends.",
+                    "url": target_url,
+                    "urlToImage": None,
+                    "publishedAt": pub_dt.isoformat() + "Z" if pub_dt else None,
+                    "content": clean_title[:200]
+                })
+                stats[outlet_key]["kept"] += 1
+        except Exception as e:
+            logger.debug(f"Bing News error for '{q}': {e}")
+        return items
+
+    bing_tasks = [_fetch_bing_q(q) for q in selected_queries]
+    bing_results = await asyncio.gather(*bing_tasks, return_exceptions=True)
+    for res in bing_results:
+        if isinstance(res, list):
+            articles.extend(res)
+    return articles
+
+_last_gdelt_time: float = 0.0
+_gdelt_lock = asyncio.Lock()
+
+async def _fetch_from_gdelt(
+    client: httpx.AsyncClient,
+    platform_name: str,
+    stats: dict[str, dict[str, int]]
+) -> list[dict]:
+    """Fetch candidate articles from GDELT DOC 2.0 with 5s polite throttle and non-JSON guard."""
+    outlet_key = "GDELT DOC 2.0"
+    if outlet_key not in stats:
+        stats[outlet_key] = {"found": 0, "kept": 0, "failed": 0}
+
+    articles: list[dict] = []
+    global _last_gdelt_time
+    async with _gdelt_lock:
+        now = time.time()
+        elapsed = now - _last_gdelt_time
+        if elapsed < 5.0:
+            await asyncio.sleep(5.0 - elapsed)
+        _last_gdelt_time = time.time()
+
+    query_term = f'"{platform_name}"'
+    encoded_q = urllib.parse.quote_plus(query_term)
+    gdelt_url = f"https://api.gdeltproject.org/api/v2/doc/doc?query={encoded_q}&mode=artlist&format=json&maxrecords=50&timespan=7d"
+    try:
+        async with _shared_semaphore:
+            resp = await client.get(gdelt_url, timeout=5.0)
+        if resp.status_code != 200:
+            return []
+
+        try:
+            data = resp.json()
+        except Exception:
+            return []
+
+        raw_articles = data.get("articles", []) if isinstance(data, dict) else []
+        for art in raw_articles:
+            stats[outlet_key]["found"] += 1
+            url = art.get("url", "")
+            title = art.get("title", "")
+            domain = art.get("domain", "GDELT")
+            if not is_valid_news_article(url, domain):
+                stats[outlet_key]["failed"] += 1
+                continue
+            if not is_topically_relevant(title, "", platform_name):
+                stats[outlet_key]["failed"] += 1
+                continue
+
+            seendate = art.get("seendate", "")
+            pub_dt = None
+            if seendate:
+                try:
+                    pub_dt = datetime.strptime(seendate, "%Y%m%dT%H%M%SZ")
+                except Exception:
+                    pass
+
+            articles.append({
+                "source": {"name": domain},
+                "author": f"via {domain}",
+                "title": title,
+                "description": f"Verified reporting via {domain} covering {platform_name} trends.",
+                "url": url,
+                "urlToImage": None,
+                "publishedAt": pub_dt.isoformat() + "Z" if pub_dt else None,
+                "content": title[:200]
+            })
+            stats[outlet_key]["kept"] += 1
+    except Exception as e:
+        logger.debug(f"GDELT fetch skipped/failed: {e}")
+
+    return articles
+
+async def _fetch_dropped_outlets_via_google(
+    client: httpx.AsyncClient,
+    platform_name: str,
+    stats: dict[str, dict[str, int]]
+) -> list[dict]:
+    """Query Google News RSS for major dropped outlets (Hindustan Times, Times Now, Gadgets 360, etc.)."""
+    articles: list[dict] = []
+    tasks = []
+    for outlet_name, domain in DROPPED_OUTLETS_DOMAINS[:4]:
+        outlet_key = f"{outlet_name} (via Google)"
+        if outlet_key not in stats:
+            stats[outlet_key] = {"found": 0, "kept": 0, "failed": 0}
+        q = f'"{platform_name}" site:{domain} when:7d'
+        tasks.append(_fetch_single_google_query(client, q, platform_name, outlet_key, stats))
+
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    for res in results:
+        if isinstance(res, list):
+            articles.extend(res)
+    return articles
+
+async def _fetch_optional_api_news(
+    client: httpx.AsyncClient,
+    platform_name: str,
+    stats: dict[str, dict[str, int]]
+) -> list[dict]:
+    """Fetch from NewsAPI or GNews if optional API keys are configured."""
+    articles: list[dict] = []
+    newsapi_key = getattr(settings, "NEWSAPI_KEY", "") or ""
+    if newsapi_key.strip():
+        outlet_key = "NewsAPI"
+        if outlet_key not in stats:
+            stats[outlet_key] = {"found": 0, "kept": 0, "failed": 0}
+        url = f"https://newsapi.org/v2/everything?q={urllib.parse.quote_plus(platform_name)}&language=en&sortBy=publishedAt&apiKey={newsapi_key.strip()}"
+        try:
+            resp = await client.get(url, timeout=5.0)
+            if resp.status_code == 200:
+                for art in resp.json().get("articles", [])[:20]:
+                    stats[outlet_key]["found"] += 1
+                    u = art.get("url")
+                    t = art.get("title")
+                    src = art.get("source", {}).get("name") or "NewsAPI"
+                    if is_valid_news_article(u, src) and is_topically_relevant(t, art.get("description", ""), platform_name):
+                        articles.append(art)
+                        stats[outlet_key]["kept"] += 1
+                    else:
+                        stats[outlet_key]["failed"] += 1
+        except Exception as e:
+            logger.debug(f"NewsAPI error: {e}")
+
+    gnews_key = getattr(settings, "GNEWS_KEY", "") or ""
+    if gnews_key.strip():
+        outlet_key = "GNews"
+        if outlet_key not in stats:
+            stats[outlet_key] = {"found": 0, "kept": 0, "failed": 0}
+        url = f"https://gnews.io/api/v4/search?q={urllib.parse.quote_plus(platform_name)}&lang=en&token={gnews_key.strip()}"
+        try:
+            resp = await client.get(url, timeout=5.0)
+            if resp.status_code == 200:
+                for art in resp.json().get("articles", [])[:20]:
+                    stats[outlet_key]["found"] += 1
+                    u = art.get("url")
+                    t = art.get("title")
+                    src = art.get("source", {}).get("name") or "GNews"
+                    if is_valid_news_article(u, src) and is_topically_relevant(t, art.get("description", ""), platform_name):
+                        articles.append(art)
+                        stats[outlet_key]["kept"] += 1
+                    else:
+                        stats[outlet_key]["failed"] += 1
+        except Exception as e:
+            logger.debug(f"GNews error: {e}")
+
     return articles
 
 async def fetch_news_for_platform(
@@ -495,12 +849,16 @@ async def fetch_news_for_platform(
     all_raw_articles: list[dict] = []
 
     async with httpx.AsyncClient(headers=HEADERS, follow_redirects=True) as client:
-        # Run all relevant outlet tasks AND Google News RSS queries concurrently
+        # Run all relevant outlet tasks, Google News, Bing News, Dropped Outlets, GDELT, and optional APIs concurrently
         tasks = [
             _fetch_from_outlet(client, outlet, platform_name, stats)
             for outlet in relevant_outlets
         ]
         tasks.append(_fetch_from_google_news(client, platform_name, query_variants, stats))
+        tasks.append(_fetch_from_bing_news(client, platform_name, query_variants, stats))
+        tasks.append(_fetch_dropped_outlets_via_google(client, platform_name, stats))
+        tasks.append(_fetch_from_gdelt(client, platform_name, stats))
+        tasks.append(_fetch_optional_api_news(client, platform_name, stats))
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
         for res in results:
@@ -540,7 +898,7 @@ async def fetch_news_for_platform(
     deduped_articles.sort(key=sort_key, reverse=True)
 
     # 4. Cap at 20 items per platform
-    final_articles = deduped_articles[:20]
+    final_articles = deduped_articles[:MAX_ARTICLES_PER_PLATFORM]
 
     # 5. Print per-outlet summary
     print(f"\n========================================================")

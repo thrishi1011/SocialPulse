@@ -154,22 +154,32 @@ class AbstractFetcher(ABC):
                 if "key" in error_msg.lower() or "not configured" in error_msg.lower():
                     logger.error(f"[{self.slug}] Required API key or configuration missing: {error_msg}")
 
-                logger.warning(f"[{self.slug}] Live fetch failed ({error_msg}). Falling back to verified fallback data to prevent empty platform.")
-                raw_items = self.load_mock_data()
-                status = "fallback_mock" if raw_items else "error"
+                if self.source_category == "B":
+                    # In live mode do NOT top up Category B sources with sample/mock items
+                    logger.warning(f"[{self.slug}] Live fetch failed: {error_msg}. No mock fallback for Category B in live mode.")
+                    status = "error"
+                else:
+                    logger.warning(f"[{self.slug}] Live fetch failed ({error_msg}). Falling back to verified fallback data to prevent empty platform.")
+                    raw_items = self.load_mock_data()
+                    status = "fallback_mock" if raw_items else "error"
             elif not raw_items:
-                logger.warning(f"[{self.slug}] Live fetch returned 0 items. Falling back to verified fallback data.")
-                raw_items = self.load_mock_data()
-                if raw_items:
-                    status = "fallback_mock"
+                if self.source_category == "B":
+                    logger.warning(f"[{self.slug}] Live fetch returned 0 items. No mock top-up in live mode for Category B.")
+                    status = "success"
+                else:
+                    logger.warning(f"[{self.slug}] Live fetch returned 0 items. Falling back to verified fallback data.")
+                    raw_items = self.load_mock_data()
+                    if raw_items:
+                        status = "fallback_mock"
             elif len(raw_items) < 4:
-                # If live scrape only found 1-3 items, supplement with fallback items to guarantee a rich feed
-                mock_supplements = self.load_mock_data()
-                seen_titles = {str(r.get("title", "") or r.get("query", "")).strip().lower() for r in raw_items}
-                for m in mock_supplements:
-                    m_title = str(m.get("title", "") or m.get("query", "")).strip().lower()
-                    if m_title and m_title not in seen_titles:
-                        raw_items.append(m)
+                # In live mode do NOT top up Category B sources with sample/mock items
+                if self.source_category != "B":
+                    mock_supplements = self.load_mock_data()
+                    seen_titles = {str(r.get("title", "") or r.get("query", "")).strip().lower() for r in raw_items}
+                    for m in mock_supplements:
+                        m_title = str(m.get("title", "") or m.get("query", "")).strip().lower()
+                        if m_title and m_title not in seen_titles:
+                            raw_items.append(m)
 
         normalized_items: list[TrendingItemCreate] = []
         if raw_items:

@@ -317,11 +317,23 @@ SORTED_INDIAN_LOCATIONS = sorted(INDIAN_LOCATIONS, key=lambda x: len(x[0]), reve
 
 CATEGORY_KEYWORDS = [
     ("Politics", [
-        "minister", "bjp", "congress", "election", "vote", "parliament", "lok sabha",
-        "rajya sabha", "supreme court", "government", "policy", "modi", "rahul",
-        "kejriwal", "chief minister", "cm", "mla", "mp", "bill", "constitution",
-        "assembly", "judiciary", "cabinet", "protest", "strike", "rally", "court",
-        "verdict", "aatmanirbhar", "sanatan", "neet"
+        "minister", "ministers", "ministry", "prime minister", "chief minister",
+        "cabinet minister", "union minister", "delhi cm", "up cm", "bjp", "congress",
+        "aap", "tmc", "dmk", "tdp", "ysrcp", "brs", "sp", "bsp", "rjd", "jdu", "cpim",
+        "election", "elections", "vote", "voter", "voters", "voting", "voter list",
+        "ballot", "evm", "parliament", "lok sabha", "rajya sabha", "supreme court",
+        "high court", "court verdict", "court order", "court ruling", "court notice", "judiciary",
+        "government", "governance", "policy", "modi", "rahul gandhi", "kejriwal",
+        "amit shah", "nara lokesh", "yogi", "stalin", "siddaramaiah", "mamata", "nitish",
+        "member of parliament", "mp election", "mla", "parliament bill",
+        "legislative bill", "constitution", "assembly", "cabinet", "protest rally",
+        "political rally", "political party", "political speech", "political campaign",
+        "opposition leader", "ruling party", "it rules", "blocking order", "takedown notice",
+        "aatmanirbhar", "sanatan", "neet", "manifesto", "coalition", "police", "fir",
+        "custody", "bail", "cbi", "ed", "nia", "governor", "collector", "ias", "ips",
+        "panchayat", "municipal", "dharna", "spokesperson", "nda", "india bloc", "by-poll",
+        "constituency", "misinformation", "deepfake", "fact check", "it cell",
+        "[trending in news]"
     ]),
     ("Health", [
         "covid", "virus", "health", "hospital", "doctor", "medicine", "vaccine",
@@ -400,8 +412,12 @@ def classify_category_heuristic(text: str, default_source: str = "") -> str:
 
     # Source-based defaults if no keyword match
     source_lower = default_source.lower()
+    if "[trending in news]" in lower_text or "categoryid=25" in lower_text:
+        return "Politics"
     if "twitch" in source_lower:
         return "Gaming"
+    if any(s in source_lower for s in ["_news", "news"]):
+        return "Politics"
     if "youtube" in source_lower:
         return "Entertainment"
     if "google_trends" in source_lower:

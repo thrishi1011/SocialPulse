@@ -15,6 +15,7 @@ class SourceResponse(BaseModel):
     icon_filename: str | None = None
     is_enabled: bool
     fetch_interval_min: int
+    item_count: int = 0
 
     class Config:
         from_attributes = True
@@ -172,6 +173,8 @@ class FilterMetadata(BaseModel):
     region_scope: str | None = None
     category: str | None = None
     sort: str = "recency"
+    window_widened_to: str | None = None
+    original_window_count: int | None = None
 
 class TrendListResponse(BaseModel):
     items: list[TrendItemResponse]
@@ -180,6 +183,8 @@ class TrendListResponse(BaseModel):
     per_page: int
     total_pages: int
     filters_applied: FilterMetadata
+    window_widened_to: str | None = None
+    original_window_count: int | None = None
 
 
 # ============================================================

@@ -180,10 +180,11 @@ function renderSourceTabs() {
 
   const catASources = state.sources.filter(s => s.source_category === "A");
   const catBSources = state.sources.filter(s => s.source_category === "B");
+  const totalCount = state.sources.reduce((sum, s) => sum + (s.item_count || 0), 0);
 
   let html = `
     <button class="source-tab ${state.activeSource === "all" ? "active" : ""}" data-slug="all">
-      <span>All Sources</span>
+      <span>All Sources <span class="tab-count" style="font-size: 11px; opacity: 0.75; font-family: var(--font-mono, monospace);">(${totalCount})</span></span>
     </button>
   `;
 
@@ -193,7 +194,7 @@ function renderSourceTabs() {
       html += `
         <button class="source-tab ${isActive}" data-slug="${escapeHTML(s.slug)}" data-cat="A">
           <img src="/static/assets/icons/${escapeHTML(s.icon_filename || 'youtube.svg')}" alt="" />
-          <span>${escapeHTML(s.display_name)}</span>
+          <span>${escapeHTML(s.display_name)} <span class="tab-count" style="font-size: 11px; opacity: 0.75; font-family: var(--font-mono, monospace);">(${s.item_count || 0})</span></span>
           <span class="tab-indicator"></span>
         </button>
       `;
@@ -210,7 +211,7 @@ function renderSourceTabs() {
       html += `
         <button class="source-tab cat-b-tab ${isActive}" data-slug="${escapeHTML(s.slug)}" data-cat="B">
           <img src="/static/assets/icons/${escapeHTML(s.icon_filename || 'google-trends.svg')}" alt="" />
-          <span>${escapeHTML(s.display_name)}</span>
+          <span>${escapeHTML(s.display_name)} <span class="tab-count" style="font-size: 11px; opacity: 0.75; font-family: var(--font-mono, monospace);">(${s.item_count || 0})</span></span>
           <span class="tab-indicator" style="background: var(--cat-b-amber);"></span>
         </button>
       `;
@@ -305,7 +306,11 @@ function renderTrendsGrid() {
   }
 
   if (counter) {
-    counter.innerText = `Showing ${displayItems.length} of ${state.total} items`;
+    if (state.windowWidenedTo) {
+      counter.innerHTML = `Showing ${displayItems.length} of ${state.total} items <span class="widened-badge" style="margin-left: 8px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 2px 8px; border-radius: 9999px; font-size: 11px; border: 1px solid rgba(245, 158, 11, 0.3);">ℹ️ Showing last ${escapeHTML(state.windowWidenedTo)} (only ${state.originalWindowCount ?? 0} in ${escapeHTML(state.recency)})</span>`;
+    } else {
+      counter.innerText = `Showing ${displayItems.length} of ${state.total} items`;
+    }
   }
 
   let html = "";
@@ -697,6 +702,8 @@ async function fetchAndRenderTrends() {
     state.items = data.items;
     state.total = data.total;
     state.totalPages = data.total_pages;
+    state.windowWidenedTo = data.window_widened_to || data.filters_applied?.window_widened_to;
+    state.originalWindowCount = data.original_window_count !== undefined ? data.original_window_count : data.filters_applied?.original_window_count;
 
     renderTrendsGrid();
     renderPagination();

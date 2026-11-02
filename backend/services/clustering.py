@@ -274,7 +274,7 @@ Return ONLY a valid JSON array matching this format (no markdown code blocks, no
         for attempt in range(2):  # Retry once on JSON failure
             try:
                 gemini_rate_limiter.acquire()
-                model = genai.GenerativeModel("gemini-2.5-flash")
+                model = genai.GenerativeModel("gemini-3.8-flash")
                 response = model.generate_content(prompt)
                 raw_text = response.text.strip()
                 if raw_text.startswith("```json"):
@@ -336,7 +336,7 @@ Return ONLY a valid JSON array:
 """
     try:
         gemini_rate_limiter.acquire()
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        model = genai.GenerativeModel("gemini-3.8-flash")
         res = model.generate_content(prompt)
         text = res.text.strip()
         if text.startswith("```json"):

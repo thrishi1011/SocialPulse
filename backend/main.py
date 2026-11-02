@@ -62,6 +62,19 @@ async def _start_ipv6_proxy():
         return None
 
 
+async def _initial_load():
+    """Fetch and run the AI sweep in the background so the server accepts requests right away."""
+    db = SessionLocal()
+    try:
+        await run_pipeline(db, force_live=False)
+        await process_unprocessed_items(db, limit=100)
+        print("[Startup] Initial load finished.")
+    except Exception as e:
+        print(f"[Startup] Initial load failed: {e}")
+    finally:
+        db.close()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 1. Startup: Initialize and seed database
@@ -87,10 +100,8 @@ async def lifespan(app: FastAPI):
                 break
 
         if needs_refresh or db.query(TrendingItem).count() == 0:
-            print("[Startup] Platform feeds are missing or older than 12h. Running comprehensive startup fetch sweep...")
-            await run_pipeline(db, force_live=False)
-            await process_unprocessed_items(db, limit=100)
-            print(f"[Startup] Ingestion completed. DB now contains {db.query(TrendingItem).count()} items across all platforms.")
+            print("[Startup] Feeds missing or stale. Loading data in the background...")
+            app.state.initial_task = asyncio.create_task(_initial_load())
     finally:
         db.close()
 
