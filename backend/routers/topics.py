@@ -14,9 +14,10 @@ from sqlalchemy import func, desc
 from backend.database import get_db
 from backend.models import Topic, TrendingItem, Source
 from backend.schemas import (
-    TopicListResponse, TopicListItemResponse, TopicDetailResponse
+    TopicListResponse, TopicListItemResponse, TopicDetailResponse, CommentListResponse
 )
 from backend.routers.trends import format_trend_item
+from backend.services.comments_service import get_or_create_topic_comments, format_comments_response
 
 router = APIRouter(prefix="/api/v1/topics", tags=["topics"])
 
@@ -109,3 +110,30 @@ def get_topic_detail(topic_id: int, db: Session = Depends(get_db)):
         updated_at=topic.updated_at,
         items=formatted_items
     )
+
+
+@router.get("/{topic_id}/comments", response_model=CommentListResponse)
+def get_topic_comments(
+    topic_id: int,
+    limit: int = Query(8, ge=1, le=25, description="Max comments to retrieve"),
+    db: Session = Depends(get_db)
+):
+    """
+    Retrieve sourced community comments and cross-platform reactions for a macro story topic.
+    """
+    topic = (
+        db.query(Topic)
+        .options(
+            joinedload(Topic.items).joinedload(TrendingItem.source),
+            joinedload(Topic.items).joinedload(TrendingItem.category)
+        )
+        .filter(Topic.id == topic_id)
+        .first()
+    )
+
+    if not topic:
+        raise HTTPException(status_code=404, detail=f"Topic with ID {topic_id} not found.")
+
+    comments = get_or_create_topic_comments(db, topic, limit=limit)
+    err_msg = getattr(comments, "error", None)
+    return format_comments_response(comments, error=err_msg)

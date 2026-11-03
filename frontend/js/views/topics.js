@@ -6,7 +6,7 @@
  * Includes AI story synthesis, convergence badges, source provenance, and expandable member items.
  */
 import { api } from "../api.js";
-import { timeAgo, formatNumber, escapeHTML } from "../utils.js";
+import { timeAgo, formatNumber, escapeHTML, renderCommentCardHTML, renderSentimentBreakdownHTML } from "../utils.js";
 
 let currentTopicRecency = "24h";
 
@@ -123,10 +123,16 @@ async function loadTopicsData(container) {
           </div>
 
           <div class="topic-footer">
-            <button class="expand-topic-btn" data-topic-id="${t.id}">
-              <span>View ${t.item_count} Member Stories</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
+            <div class="topic-footer-buttons">
+              <button class="expand-topic-btn" data-topic-id="${t.id}">
+                <span>View ${t.item_count} Member Stories</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <button class="expand-topic-comments-btn" data-topic-id="${t.id}">
+                <span>💬 Community Discussions</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </div>
           </div>
 
           <!-- Collapsible Member Items Container -->
@@ -135,11 +141,18 @@ async function loadTopicsData(container) {
               <div class="spinner"></div> Loading member stories...
             </div>
           </div>
+
+          <!-- Collapsible Community Discussions Container -->
+          <div class="topic-comments-drawer" id="topic-comments-${t.id}" style="display: none;">
+            <div class="topic-comments-inner" id="topic-comments-list-${t.id}">
+              <div class="spinner"></div> Loading cross-platform discussions...
+            </div>
+          </div>
         </article>
       `;
     }).join("");
 
-    // Attach expand toggle events
+    // Attach member stories expand toggle events
     listEl.querySelectorAll(".expand-topic-btn").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const topicId = btn.getAttribute("data-topic-id");
@@ -189,8 +202,54 @@ async function loadTopicsData(container) {
       });
     });
 
+    // Attach community discussions expand toggle events
+    listEl.querySelectorAll(".expand-topic-comments-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const topicId = btn.getAttribute("data-topic-id");
+        const drawer = listEl.querySelector(`#topic-comments-${topicId}`);
+        const commentsList = listEl.querySelector(`#topic-comments-list-${topicId}`);
+
+        if (drawer.style.display !== "none") {
+          drawer.style.display = "none";
+          btn.classList.remove("active");
+          btn.querySelector("span").textContent = `💬 Community Discussions`;
+          return;
+        }
+
+        drawer.style.display = "block";
+        btn.classList.add("active");
+        btn.querySelector("span").textContent = `Hide Discussions`;
+
+        try {
+          const data = await api.getTopicComments(topicId, 8);
+          if (!data.comments || data.comments.length === 0) {
+            commentsList.innerHTML = `<div class="comments-empty-notice">No cross-platform reactions detected for this topic yet.</div>`;
+            return;
+          }
+
+          commentsList.innerHTML = `
+            <div class="topic-comments-wrapper">
+              <div class="topic-comments-meta-bar">
+                <span class="topic-comments-heading">Cross-Platform Reactions (${data.total})</span>
+                ${data.is_generated !== false ? '<span class="generated-badge">SAMPLE / GENERATED COMMENTS</span>' : ''}
+                <div class="comments-sentiment-strip">
+                  ${renderSentimentBreakdownHTML(data.sentiment_breakdown, data.total)}
+                </div>
+              </div>
+              <div class="topic-comments-grid">
+                ${data.comments.map(c => renderCommentCardHTML(c)).join("")}
+              </div>
+            </div>
+          `;
+        } catch (err) {
+          commentsList.innerHTML = `<div class="error-msg">Failed to load topic discussions: ${err.message}</div>`;
+        }
+      });
+    });
+
   } catch (err) {
     console.error("Failed to load topics:", err);
     loadingEl.innerHTML = `<div class="error-msg">Failed to load macro topics: ${err.message}</div>`;
   }
 }
+

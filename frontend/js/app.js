@@ -3,7 +3,7 @@
  */
 
 import { api } from "./api.js";
-import { timeAgo, formatNumber, escapeHTML, truncate } from "./utils.js";
+import { timeAgo, formatNumber, escapeHTML, truncate, renderCommentCardHTML, renderSentimentBreakdownHTML } from "./utils.js";
 import { renderAnalyticsView } from "./views/analytics.js";
 import { renderHealthView, stopHealthAutoRefresh } from "./views/health.js";
 import { renderTopicsView } from "./views/topics.js";
@@ -495,9 +495,12 @@ async function openDetailDrawer(itemId) {
   drawer.classList.add("open");
 
   try {
-    const item = await api.getTrendById(itemId);
+    const [item, history, commentsData] = await Promise.all([
+      api.getTrendById(itemId),
+      api.getTrendHistory(itemId).catch(() => ({ snapshots: [] })),
+      api.getItemComments(itemId, 10).catch(() => ({ total: 0, comments: [], sentiment_breakdown: {}, is_generated: true }))
+    ]);
     const isCatA = item.source_category === "A";
-    const history = await api.getTrendHistory(itemId).catch(() => ({ snapshots: [] }));
 
     let provenanceDescription = "";
     let ctaButtonCopy = `View on ${escapeHTML(item.source.display_name)} →`;
@@ -591,6 +594,27 @@ async function openDetailDrawer(itemId) {
             Momentum needs a few fetch cycles to appear. Snapshots are recorded on each scheduled run.
           </div>
         `}
+      </div>
+
+
+      <!-- Sourced Community Reactions & Comments Section (Top 10) -->
+      <div class="drawer-comments-section">
+        <div class="drawer-comments-header">
+          <div class="drawer-comments-title-wrap">
+            <span class="drawer-comments-title">💬 Sourced Community Reactions</span>
+            <span class="comments-count-pill">${commentsData.total || 0} reactions</span>
+            ${commentsData.is_generated !== false ? '<span class="generated-badge">SAMPLE / GENERATED COMMENTS</span>' : ''}
+          </div>
+          <div class="comments-sentiment-strip">
+            ${renderSentimentBreakdownHTML(commentsData.sentiment_breakdown, commentsData.total)}
+          </div>
+        </div>
+        <div class="drawer-comments-list">
+          ${commentsData.comments && commentsData.comments.length > 0
+            ? commentsData.comments.map(c => renderCommentCardHTML(c)).join("")
+            : `<div class="comments-empty-notice">No community comments recorded for this item yet.</div>`
+          }
+        </div>
       </div>
 
       <!-- Data Source Provenance Box -->

@@ -13,9 +13,10 @@ from backend.models import TrendingItem, Source, Category, TrendSnapshot
 from backend.schemas import (
     TrendListResponse, TrendItemResponse, EngagementMetric,
     FilterMetadata, CategoryResponse, SourceResponse, TrendRegion,
-    TrendHistoryResponse, TrendSnapshotPoint
+    TrendHistoryResponse, TrendSnapshotPoint, CommentListResponse
 )
 from backend.services.momentum import batch_calculate_momentum
+from backend.services.comments_service import get_or_create_item_comments, format_comments_response
 
 router = APIRouter(prefix="/api/v1/trends", tags=["trends"])
 
@@ -441,6 +442,28 @@ def get_trend_history(item_id: int, db: Session = Depends(get_db)):
         total_snapshots=len(snapshots),
         snapshots=[TrendSnapshotPoint.model_validate(s) for s in snapshots]
     )
+
+
+@router.get("/{item_id}/comments", response_model=CommentListResponse)
+def get_item_comments(
+    item_id: int,
+    limit: int = Query(10, ge=1, le=50, description="Max comments to retrieve"),
+    db: Session = Depends(get_db)
+):
+    """
+    Retrieve sourced community comments and reactions for a specific trending item.
+    """
+    item = db.query(TrendingItem).options(
+        joinedload(TrendingItem.source),
+        joinedload(TrendingItem.category)
+    ).filter(TrendingItem.id == item_id).first()
+
+    if not item:
+        raise HTTPException(status_code=404, detail=f"Trending item with ID {item_id} not found.")
+
+    comments = get_or_create_item_comments(db, item, limit=limit)
+    err_msg = getattr(comments, "error", None)
+    return format_comments_response(comments, error=err_msg)
 
 @router.get("/{item_id}", response_model=TrendItemResponse)
 def get_trend_by_id(item_id: int, db: Session = Depends(get_db)):

@@ -332,3 +332,36 @@ class TrendHistoryResponse(BaseModel):
     source_slug: str
     total_snapshots: int
     snapshots: list[TrendSnapshotPoint]
+
+
+# ============================================================
+# Community Comments & Reactions Schemas
+# ============================================================
+
+class CommentResponse(BaseModel):
+    id: int
+    item_id: int | None = None
+    topic_id: int | None = None
+    author: str
+    author_handle: str
+    author_avatar_color: str | None = "#3b82f6"
+    platform: str
+    content: str
+    upvotes: int = 0
+    sentiment: str = "neutral"
+    is_generated: bool = True
+    url: str | None = None
+    published_at: datetime
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class CommentListResponse(BaseModel):
+    total: int = 0
+    is_generated: bool = False
+    error: str | None = None
+    message: str | None = None
+    sentiment_breakdown: dict[str, int] = {}
+    comments: list[CommentResponse] = []

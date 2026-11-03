@@ -74,6 +74,7 @@ class TrendingItem(Base):
     category = relationship("Category", back_populates="trending_items")
     topic = relationship("Topic", back_populates="items")
     snapshots = relationship("TrendSnapshot", back_populates="item", cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="item", cascade="all, delete-orphan")
 
     # Constraints & Indexes
     __table_args__ = (
@@ -121,6 +122,7 @@ class Topic(Base):
 
     # Relationships
     items = relationship("TrendingItem", back_populates="topic")
+    comments = relationship("Comment", back_populates="topic", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Topic(id={self.id}, title='{self.title[:30]}...', sources={self.source_count}, items={self.item_count})>"
@@ -146,4 +148,36 @@ class TrendSnapshot(Base):
 
     def __repr__(self):
         return f"<TrendSnapshot(item_id={self.item_id}, rank={self.rank}, val={self.engagement_value})>"
+
+
+class Comment(Base):
+    __tablename__ = "comments"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    item_id = Column(Integer, ForeignKey("trending_items.id", ondelete="CASCADE"), nullable=True, index=True)
+    topic_id = Column(Integer, ForeignKey("topics.id", ondelete="CASCADE"), nullable=True, index=True)
+    author = Column(String(128), nullable=False)
+    author_handle = Column(String(128), nullable=False)
+    author_avatar_color = Column(String(16), nullable=True, default="#3b82f6")
+    platform = Column(String(32), nullable=False)  # 'reddit', 'youtube', 'bluesky', 'mastodon', 'twitter', 'twitch', etc.
+    content = Column(Text, nullable=False)
+    upvotes = Column(Integer, default=0, nullable=False)
+    sentiment = Column(String(32), default="neutral", nullable=False)
+    is_generated = Column(Boolean, default=True, nullable=False)
+    url = Column(String(512), nullable=True)
+    published_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationships
+    item = relationship("TrendingItem", back_populates="comments")
+    topic = relationship("Topic", back_populates="comments")
+
+    __table_args__ = (
+        Index("idx_comments_item_id", "item_id"),
+        Index("idx_comments_topic_id", "topic_id"),
+    )
+
+    def __repr__(self):
+        return f"<Comment(id={self.id}, author='{self.author_handle}', platform='{self.platform}')>"
+
 

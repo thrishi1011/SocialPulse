@@ -49,3 +49,103 @@ export function truncate(str, maxLength = 140) {
   if (str.length <= maxLength) return str;
   return str.substring(0, maxLength).trim() + "...";
 }
+
+
+export function getInitials(name) {
+  if (!name) return "?";
+  const parts = name.trim().replace(/^[@u\/]+/, "").split(/[\s_.]+/);
+  if (parts.length >= 2 && parts[0] && parts[1]) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return parts[0] ? parts[0].slice(0, 2).toUpperCase() : "?";
+}
+
+export function getPlatformBadge(platform) {
+  const p = (platform || "social").toLowerCase();
+  const map = {
+    youtube: { label: "YouTube", class: "platform-yt" },
+    reddit: { label: "Reddit", class: "platform-reddit" },
+    bluesky: { label: "Bluesky", class: "platform-bsky" },
+    mastodon: { label: "Mastodon", class: "platform-mastodon" },
+    twitter: { label: "X (Twitter)", class: "platform-twitter" },
+    twitch: { label: "Twitch", class: "platform-twitch" },
+  };
+  return map[p] || { label: platform, class: "platform-generic" };
+}
+
+export function getSentimentBadge(sentiment) {
+  const s = (sentiment || "neutral").toLowerCase();
+  const map = {
+    positive: { label: "Positive", icon: "\u{1F7E2}", class: "sentiment-positive" },
+    excited: { label: "Excited", icon: "\u{1F525}", class: "sentiment-excited" },
+    curious: { label: "Curious", icon: "\u{1F4A1}", class: "sentiment-curious" },
+    critical: { label: "Critical", icon: "\u26A0\uFE0F", class: "sentiment-critical" },
+    neutral: { label: "Neutral", icon: "\u26AA", class: "sentiment-neutral" }
+  };
+  return map[s] || { label: sentiment, icon: "\u26AA", class: "sentiment-neutral" };
+}
+
+export function renderSentimentBreakdownHTML(breakdown = {}, total = 0) {
+  if (!total || total === 0) return "";
+  const badges = [];
+  const labels = [
+    { key: "positive", label: "Positive" },
+    { key: "excited", label: "Excited" },
+    { key: "curious", label: "Curious" },
+    { key: "neutral", label: "Neutral" },
+    { key: "critical", label: "Critical" }
+  ];
+  for (const { key, label } of labels) {
+    const count = breakdown[key] || 0;
+    if (count > 0) {
+      const pct = Math.round((count / total) * 100);
+      const badgeInfo = getSentimentBadge(key);
+      badges.push(`
+        <span class="sentiment-pill ${badgeInfo.class}">
+          ${badgeInfo.icon} ${pct}% ${label}
+        </span>
+      `);
+    }
+  }
+  return badges.join("");
+}
+
+export function renderCommentCardHTML(c) {
+  const pBadge = getPlatformBadge(c.platform);
+  const sBadge = getSentimentBadge(c.sentiment);
+  const initials = getInitials(c.author);
+  const avatarBg = c.author_avatar_color || "#3b82f6";
+  const isGenerated = c.is_generated !== false;
+
+  return `
+    <div class="comment-card" id="comment-${c.id}">
+      <div class="comment-card-top">
+        <div class="comment-user-area">
+          <div class="comment-avatar" style="background-color: ${escapeHTML(avatarBg)};">
+            ${escapeHTML(initials)}
+          </div>
+          <div class="comment-user-info">
+            <span class="comment-author-name">${escapeHTML(c.author)}</span>
+            <span class="comment-author-handle">${escapeHTML(c.author_handle)}</span>
+          </div>
+        </div>
+        <div class="comment-meta-badges">
+          ${isGenerated ? '<span class="comment-generated-badge">SAMPLE / GENERATED COMMENTS</span>' : ''}
+          <span class="comment-platform-badge ${pBadge.class}">${pBadge.label}</span>
+          <span class="comment-time">${timeAgo(c.published_at || c.created_at)}</span>
+        </div>
+      </div>
+      <p class="comment-text">${escapeHTML(c.content)}</p>
+      <div class="comment-card-footer">
+        <div class="comment-engagement">
+          <span class="upvote-icon">\u25B2</span>
+          <strong>${formatNumber(c.upvotes) || '0'}</strong>
+          <span class="engagement-sub">reactions</span>
+        </div>
+        <span class="comment-sentiment-chip ${sBadge.class}">
+          ${sBadge.icon} ${sBadge.label}
+        </span>
+      </div>
+    </div>
+  `;
+}

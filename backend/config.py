@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 # Load .env file from project root
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
+load_dotenv(BASE_DIR / ".env", override=True)
 
 class Settings:
     PROJECT_NAME: str = "SocialPulse — Multi-Platform Social Media Trending Intelligence"
@@ -25,6 +25,7 @@ class Settings:
     # Execution Modes
     MOCK_FETCH_MODE: bool = os.getenv("MOCK_FETCH_MODE", "true").lower() in ("true", "1", "yes")
     MOCK_AI_MODE: bool = os.getenv("MOCK_AI_MODE", "true").lower() in ("true", "1", "yes")
+    ENABLE_SAMPLE_COMMENTS: bool = os.getenv("ENABLE_SAMPLE_COMMENTS", "false").lower() in ("true", "1", "yes")
     # Comma-separated list of sources to run in LIVE mode even if MOCK_FETCH_MODE is true
     LIVE_SOURCES: list[str] = [
         s.strip().lower() for s in os.getenv(

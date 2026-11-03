@@ -111,5 +111,14 @@ export const api = {
   // Trend History & Momentum
   async getTrendHistory(id) {
     return request(`${API_BASE}/trends/${id}/history`);
+  },
+
+  // Community Comments & Social Reactions
+  async getItemComments(id, limit = 10) {
+    return request(`${API_BASE}/trends/${id}/comments?limit=${limit}`);
+  },
+
+  async getTopicComments(id, limit = 8) {
+    return request(`${API_BASE}/topics/${id}/comments?limit=${limit}`);
   }
 };

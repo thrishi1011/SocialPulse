@@ -35,6 +35,14 @@ def run_startup_migrations(engine: Engine):
                         logger.debug(f"Index creation notice: {idx_err}")
                     logger.info("Migration complete: 'topic_id' column added.")
 
+            # 2. Ensure comments table exists
+            from backend.models import Comment
+            Comment.__table__.create(bind=conn, checkfirst=True)
+            if "comments" in existing_tables:
+                comment_cols = {col["name"] for col in inspector.get_columns("comments")}
+                if "url" not in comment_cols:
+                    conn.execute(text("ALTER TABLE comments ADD COLUMN url VARCHAR(512);"))
+
     except Exception as e:
         logger.error(f"Error during startup migrations: {e}", exc_info=True)
         # Non-fatal error logging so application startup continues if already migrated

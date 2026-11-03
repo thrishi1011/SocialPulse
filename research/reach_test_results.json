@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-11-02T08:31:10.606245Z",
+  "total_quota_units_used": 107,
+  "video_1": {
+    "pages_fetched": 65,
+    "threads_retrieved": 6500,
+    "total_replies_signaled": 353,
+    "stopped_by_token_end": false,
+    "video_id": "s4458uJDx_o",
+    "title": "Playing Free Fire INDIA For The First Time \ud83d\ude0d  \u0915\u094d\u092f\u093e \u0928\u092f\u093e \u0939\u0948 ?",
+    "reported_comment_count": 12400,
+    "thread_coverage_ratio": 0.5241935483870968,
+    "combined_coverage_ratio": 0.5526612903225806
+  },
+  "video_2": {
+    "pages_fetched": 40,
+    "threads_retrieved": 3977,
+    "total_replies_signaled": 309,
+    "stopped_by_token_end": true,
+    "video_id": "soTifahQC7o",
+    "title": "WE FELL INTO THE VOLCANO",
+    "reported_comment_count": 4286,
+    "thread_coverage_ratio": 0.9279048063462436,
+    "combined_coverage_ratio": 1.0
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "timestamp": "2026-11-02T07:54:25.456388Z",
+  "total_quota_units_used": 13,
+  "results": [
+    {
+      "tier": "Low Volume",
+      "video_id": "IoQZuhMCyYk",
+      "title": "#video - \u0939\u092e \u091b\u0920 \u0915\u0930\u092c | Hum Chhath Karab | #Anu Dubey Chhath Song 2026 | Bhojpuri #Chhath Geet 2026",
+      "channel": "Anu Dubey Entertainment ",
+      "reported_comment_count": 35,
+      "pages_fetched": 1,
+      "top_level_threads_retrieved": 30,
+      "replies_signaled": 5,
+      "combined_coverage": 35,
+      "coverage_mismatch": 0,
+      "avg_latency_ms": 208.32,
+      "pages_detail": [
+        {
+          "page": 1,
+          "status_code": 200,
+          "latency_ms": 208.32,
+          "items_count": 30,
+          "total_reply_count": 5,
+          "has_next_page_token": false
+        }
+      ],
+      "order_time_first_comment_age": "2026-10-31T03:28:16Z",
+      "order_relevance_first_comment_age": "2026-10-31T03:28:16Z"
+    },
+    {
+      "tier": "Medium Volume",
+      "video_id": "nrrZbyint50",
+      "title": "#VIDEO | \u0930\u093e\u0924 \u092d\u0930 \u0928\u093e\u091a | #Raushan Rohi & #Khushi Kakkar | Ft. #Trishakar Madhu | #Rangdari Maghi Song",
+      "channel": "Shiv Shakti Records",
+      "reported_comment_count": 1236,
+      "pages_fetched": 4,
+      "top_level_threads_retrieved": 400,
+      "replies_signaled": 62,
+      "combined_coverage": 462,
+      "coverage_mismatch": 774,
+      "avg_latency_ms": 349.01,
+      "pages_detail": [
+        {
+          "page": 1,
+          "status_code": 200,
+          "latency_ms": 395.29,
+          "items_count": 100,
+          "total_reply_count": 62,
+          "has_next_page_token": true
+        },
+        {
+          "page": 2,
+          "status_code": 200,
+          "latency_ms": 343.64,
+          "items_count": 100,
+          "total_reply_count": 0,
+          "has_next_page_token": true
+        },
+        {
+          "page": 3,
+          "status_code": 200,
+          "latency_ms": 336.6,
+          "items_count": 100,
+          "total_reply_count": 0,
+          "has_next_page_token": true
+        },
+        {
+          "page": 4,
+          "status_code": 200,
+          "latency_ms": 320.5,
+          "items_count": 100,
+          "total_reply_count": 0,
+          "has_next_page_token": true
+        }
+      ],
+      "order_time_first_comment_age": "2026-11-02T07:32:49Z",
+      "order_relevance_first_comment_age": "2026-11-01T03:33:10Z"
+    },
+    {
+      "tier": "High Volume",
+      "video_id": "s4458uJDx_o",
+      "title": "Playing Free Fire INDIA For The First Time \ud83d\ude0d  \u0915\u094d\u092f\u093e \u0928\u092f\u093e \u0939\u0948 ?",
+      "channel": "Desi Gamers",
+      "reported_comment_count": 12305,
+      "pages_fetched": 4,
+      "top_level_threads_retrieved": 400,
+      "replies_signaled": 60,
+      "combined_coverage": 460,
+      "coverage_mismatch": 11845,
+      "avg_latency_ms": 292.14,
+      "pages_detail": [
+        {
+          "page": 1,
+          "status_code": 200,
+          "latency_ms": 332.4,
+          "items_count": 100,
+          "total_reply_count": 47,
+          "has_next_page_token": true
+        },
+        {
+          "page": 2,
+          "status_code": 200,
+          "latency_ms": 266.59,
+          "items_count": 100,
+          "total_reply_count": 8,
+          "has_next_page_token": true
+        },
+        {
+          "page": 3,
+          "status_code": 200,
+          "latency_ms": 280.2,
+          "items_count": 100,
+          "total_reply_count": 2,
+          "has_next_page_token": true
+        },
+        {
+          "page": 4,
+          "status_code": 200,
+          "latency_ms": 289.36,
+          "items_count": 100,
+          "total_reply_count": 3,
+          "has_next_page_token": true
+        }
+      ],
+      "order_time_first_comment_age": "2026-11-02T07:53:59Z",
+      "order_relevance_first_comment_age": "2026-11-01T22:40:33Z"
+    }
+  ]
+}
