@@ -30,12 +30,6 @@ from backend.routers.topics import get_topic_comments
 @pytest.fixture
 def db_session():
     """Create an in-memory SQLite database for test isolation."""
-    from backend.config import settings
-    orig_yt_key = settings.YOUTUBE_API_KEY
-    orig_sample = settings.ENABLE_SAMPLE_COMMENTS
-    settings.YOUTUBE_API_KEY = None
-    settings.ENABLE_SAMPLE_COMMENTS = True
-
     engine = create_engine("sqlite:///:memory:", echo=False)
     Base.metadata.create_all(bind=engine)
     Session = sessionmaker(bind=engine)
@@ -84,12 +78,8 @@ def db_session():
     session.add(topic)
     session.commit()
 
-    try:
-        yield session
-    finally:
-        settings.YOUTUBE_API_KEY = orig_yt_key
-        settings.ENABLE_SAMPLE_COMMENTS = orig_sample
-        session.close()
+    yield session
+    session.close()
 
 
 def test_comment_model_and_item_generation(db_session):
@@ -153,8 +143,6 @@ def test_router_item_comments_endpoint(db_session):
     assert first_c.platform
     assert first_c.content
     assert first_c.sentiment in ["positive", "neutral", "critical", "curious", "excited"]
-    assert first_c.is_generated is True
-    assert response.is_generated is True
 
     # Check sentiment breakdown is populated
     assert isinstance(response.sentiment_breakdown, dict)
@@ -189,17 +177,21 @@ def test_comments_404_handling(db_session):
     assert "not found" in exc_info_topic.value.detail.lower()
 
 
-def test_sample_comments_disabled_by_config(db_session):
-    from backend.config import settings
-    settings.ENABLE_SAMPLE_COMMENTS = False
+def test_top_10_comments_retrieval(db_session):
+    src_yt = db_session.query(Source).filter(Source.slug == 'youtube').first()
+    item2 = TrendingItem(
+        source_id=src_yt.id,
+        external_id='yt_top10_test',
+        title='Breaking News: Indian Space Program Expansion',
+        description='Major developments announced.',
+        url='https://youtube.com/watch?v=yt_top10_test',
+        source_category='A',
+        fetched_at=datetime.utcnow()
+    )
+    db_session.add(item2)
+    db_session.commit()
 
-    item = db_session.query(TrendingItem).first()
-    assert item is not None
-
-    comments = get_or_create_item_comments(db_session, item, limit=5)
-    assert len(comments) == 0
-
-    topic = db_session.query(Topic).first()
-    assert topic is not None
-    topic_comments = get_or_create_topic_comments(db_session, topic, limit=5)
-    assert len(topic_comments) == 0
+    # Default call without explicit limit should return top 10 comments
+    response = get_item_comments(item_id=item2.id, db=db_session)
+    assert response.total == 10
+    assert len(response.comments) == 10

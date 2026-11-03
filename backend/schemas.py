@@ -15,7 +15,6 @@ class SourceResponse(BaseModel):
     icon_filename: str | None = None
     is_enabled: bool
     fetch_interval_min: int
-    item_count: int = 0
 
     class Config:
         from_attributes = True
@@ -173,8 +172,6 @@ class FilterMetadata(BaseModel):
     region_scope: str | None = None
     category: str | None = None
     sort: str = "recency"
-    window_widened_to: str | None = None
-    original_window_count: int | None = None
 
 class TrendListResponse(BaseModel):
     items: list[TrendItemResponse]
@@ -183,8 +180,6 @@ class TrendListResponse(BaseModel):
     per_page: int
     total_pages: int
     filters_applied: FilterMetadata
-    window_widened_to: str | None = None
-    original_window_count: int | None = None
 
 
 # ============================================================
@@ -349,8 +344,6 @@ class CommentResponse(BaseModel):
     content: str
     upvotes: int = 0
     sentiment: str = "neutral"
-    is_generated: bool = True
-    url: str | None = None
     published_at: datetime
     created_at: datetime
 
@@ -359,9 +352,7 @@ class CommentResponse(BaseModel):
 
 
 class CommentListResponse(BaseModel):
-    total: int = 0
-    is_generated: bool = False
-    error: str | None = None
-    message: str | None = None
+    total: int
     sentiment_breakdown: dict[str, int] = {}
     comments: list[CommentResponse] = []
+

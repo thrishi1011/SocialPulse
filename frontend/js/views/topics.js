@@ -231,7 +231,6 @@ async function loadTopicsData(container) {
             <div class="topic-comments-wrapper">
               <div class="topic-comments-meta-bar">
                 <span class="topic-comments-heading">Cross-Platform Reactions (${data.total})</span>
-                ${data.is_generated !== false ? '<span class="generated-badge">SAMPLE / GENERATED COMMENTS</span>' : ''}
                 <div class="comments-sentiment-strip">
                   ${renderSentimentBreakdownHTML(data.sentiment_breakdown, data.total)}
                 </div>

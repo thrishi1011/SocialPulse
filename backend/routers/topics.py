@@ -78,6 +78,14 @@ def get_topic_detail(topic_id: int, db: Session = Depends(get_db)):
     """
     Retrieve full details for a topic, including all underlying multi-platform trending items.
     """
+    if hasattr(limit, "default"):
+        limit = limit.default
+    elif not isinstance(limit, int):
+        try:
+            limit = int(limit)
+        except Exception:
+            limit = 8
+
     topic = (
         db.query(Topic)
         .options(
@@ -121,6 +129,14 @@ def get_topic_comments(
     """
     Retrieve sourced community comments and cross-platform reactions for a macro story topic.
     """
+    if hasattr(limit, "default"):
+        limit = limit.default
+    elif not isinstance(limit, int):
+        try:
+            limit = int(limit)
+        except Exception:
+            limit = 8
+
     topic = (
         db.query(Topic)
         .options(
@@ -135,5 +151,5 @@ def get_topic_comments(
         raise HTTPException(status_code=404, detail=f"Topic with ID {topic_id} not found.")
 
     comments = get_or_create_topic_comments(db, topic, limit=limit)
-    err_msg = getattr(comments, "error", None)
-    return format_comments_response(comments, error=err_msg)
+    return format_comments_response(comments)
+

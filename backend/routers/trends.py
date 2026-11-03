@@ -107,7 +107,7 @@ def format_trend_item(item: TrendingItem, momentum_map: dict[int, Any] | None = 
 def get_trends(
     source: Optional[List[str]] = Query(None, description="Filter by source slug(s), e.g. ?source=youtube&source=reddit"),
     source_category: Optional[str] = Query(None, pattern="^(A|B)$", description="Filter by category type: 'A' (Direct API) or 'B' (Derived Signal)"),
-    recency: str = Query("24h", pattern="^(6h|12h|24h|3d|7d|30d|all)$", description="Time window based on best timestamp (6h, 12h, 24h, 3d, 7d, 30d, all)"),
+    recency: str = Query("24h", pattern="^(6h|12h|24h|all)$", description="Time window based on best timestamp (6h, 12h, 24h, all)"),
     region_scope: Optional[str] = Query(None, pattern="^(all|india|global|local)$", description="Filter by regional scope: 'all', 'india', 'global', 'local'"),
     category: Optional[str] = Query(None, description="Filter by category name (e.g. Technology, Science)"),
     sort: str = Query("recency", pattern="^(recency|engagement|momentum)$", description="Sort order: recency, engagement, or momentum"),
@@ -123,10 +123,10 @@ def get_trends(
         joinedload(TrendingItem.category)
     )
 
-    slugs = []
     # 1. Source filtering
     if source and not hasattr(source, "default"):
         # Handle comma-separated slugs if passed as single string
+        slugs = []
         source_list = [source] if isinstance(source, str) else list(source)
         for s in source_list:
             slugs.extend([part.strip() for part in s.split(",") if part.strip()])
@@ -161,7 +161,7 @@ def get_trends(
             func.lower(TrendingItem.location_india) != "india"
         )
 
-    # 4. Recency filtering & News Window Widening Guarantee
+    # 4. Recency filtering
     # Chart-style sources (current chart snapshot) base recency on fetched_at.
     # News coverage sources base recency on actual published date (coalesce with fetched_at if missing).
     from sqlalchemy import case
@@ -172,63 +172,15 @@ def get_trends(
     )
 
     now = datetime.utcnow()
-    window_deltas = {
-        "6h": timedelta(hours=6),
-        "12h": timedelta(hours=12),
-        "24h": timedelta(hours=24),
-        "3d": timedelta(days=3),
-        "7d": timedelta(days=7),
-        "30d": timedelta(days=30),
-    }
-
-    news_slugs = {"instagram_news", "facebook_news", "twitter_news", "reddit_news", "twitch_news"}
-    news_sources_in_db = {s[0] for s in db.query(Source.slug).filter(Source.source_category == "B").all()}
-    is_news_target = bool(source_category == "B" or (slugs and any(s in news_slugs or s in news_sources_in_db or s.endswith("_news") for s in slugs)))
-
-    window_widened_to = None
-    original_window_count = None
-
-    if recency in window_deltas:
-        initial_cutoff = now - window_deltas[recency]
-        initial_count = query.filter(effective_time >= initial_cutoff).count()
-
-        if is_news_target and initial_count < 20 and recency != "all":
-            # Automatically widen window (24h -> 3d -> 7d -> 30d -> all) until 20 items reached
-            widen_steps = ["3d", "7d", "30d", "all"]
-            curr_idx = -1
-            if recency in widen_steps:
-                curr_idx = widen_steps.index(recency)
-            candidate_steps = widen_steps[curr_idx + 1:]
-
-            chosen_window = None
-            chosen_cutoff = None
-            for step in candidate_steps:
-                if step == "all":
-                    chosen_window = "all"
-                    chosen_cutoff = None
-                    break
-                step_cutoff = now - window_deltas[step]
-                step_count = query.filter(effective_time >= step_cutoff).count()
-                if step_count >= 20:
-                    chosen_window = step
-                    chosen_cutoff = step_cutoff
-                    break
-                else:
-                    chosen_window = step
-                    chosen_cutoff = step_cutoff
-
-            if chosen_window:
-                window_widened_to = chosen_window
-                original_window_count = initial_count
-                if chosen_cutoff:
-                    query = query.filter(effective_time >= chosen_cutoff)
+    hours_map = {"6h": 6, "12h": 12, "24h": 24}
+    if recency in hours_map:
+        cutoff = now - timedelta(hours=hours_map[recency])
+        recent_query = query.filter(effective_time >= cutoff)
+        # If filtering by a specific source resulted in 0 items, relax the recency cutoff so the user always sees content
+        if source and recent_query.count() == 0:
+            pass
         else:
-            recent_query = query.filter(effective_time >= initial_cutoff)
-            # If filtering by a specific source resulted in 0 items, relax the recency cutoff so the user always sees content
-            if source and recent_query.count() == 0:
-                pass
-            else:
-                query = recent_query
+            query = recent_query
 
     # 5. Sorting & Pagination
     total = query.count()
@@ -257,20 +209,11 @@ def get_trends(
         items = query.offset(offset).limit(per_page).all()
         momentum_map = batch_calculate_momentum(db, items)
     else:
-        # Default: recency descending, prioritizing Politics at top when no specific category is filtered
-        if not category:
-            query = query.outerjoin(Category, TrendingItem.category_id == Category.id)
-            is_politics = case((Category.name == "Politics", 1), else_=0)
-            query = query.order_by(
-                is_politics.desc(),
-                effective_time.desc(),
-                TrendingItem.rank.asc().nullslast()
-            )
-        else:
-            query = query.order_by(
-                effective_time.desc(),
-                TrendingItem.rank.asc().nullslast()
-            )
+        # Default: recency descending
+        query = query.order_by(
+            effective_time.desc(),
+            TrendingItem.rank.asc().nullslast()
+        )
         items = query.offset(offset).limit(per_page).all()
         momentum_map = batch_calculate_momentum(db, items)
 
@@ -282,17 +225,13 @@ def get_trends(
         page=page,
         per_page=per_page,
         total_pages=total_pages,
-        window_widened_to=window_widened_to,
-        original_window_count=original_window_count,
         filters_applied=FilterMetadata(
             source=source,
             source_category=source_category,
             recency=recency,
             region_scope=region_scope,
             category=category,
-            sort=sort,
-            window_widened_to=window_widened_to,
-            original_window_count=original_window_count
+            sort=sort
         )
     )
 
@@ -443,28 +382,6 @@ def get_trend_history(item_id: int, db: Session = Depends(get_db)):
         snapshots=[TrendSnapshotPoint.model_validate(s) for s in snapshots]
     )
 
-
-@router.get("/{item_id}/comments", response_model=CommentListResponse)
-def get_item_comments(
-    item_id: int,
-    limit: int = Query(10, ge=1, le=50, description="Max comments to retrieve"),
-    db: Session = Depends(get_db)
-):
-    """
-    Retrieve sourced community comments and reactions for a specific trending item.
-    """
-    item = db.query(TrendingItem).options(
-        joinedload(TrendingItem.source),
-        joinedload(TrendingItem.category)
-    ).filter(TrendingItem.id == item_id).first()
-
-    if not item:
-        raise HTTPException(status_code=404, detail=f"Trending item with ID {item_id} not found.")
-
-    comments = get_or_create_item_comments(db, item, limit=limit)
-    err_msg = getattr(comments, "error", None)
-    return format_comments_response(comments, error=err_msg)
-
 @router.get("/{item_id}", response_model=TrendItemResponse)
 def get_trend_by_id(item_id: int, db: Session = Depends(get_db)):
     """Retrieve full details of a single trending item by its primary ID."""
@@ -479,3 +396,33 @@ def get_trend_by_id(item_id: int, db: Session = Depends(get_db)):
 
     momentum_map = batch_calculate_momentum(db, [item])
     return format_trend_item(item, momentum_map=momentum_map)
+
+
+@router.get("/{item_id}/comments", response_model=CommentListResponse)
+def get_item_comments(
+    item_id: int,
+    limit: int = Query(10, ge=1, le=20, description="Max comments to retrieve"),
+    db: Session = Depends(get_db)
+):
+    """
+    Retrieve sourced community comments and reactions for a specific trending item.
+    """
+    item = db.query(TrendingItem).options(
+        joinedload(TrendingItem.source),
+        joinedload(TrendingItem.category)
+    ).filter(TrendingItem.id == item_id).first()
+
+    if hasattr(limit, "default"):
+        limit = limit.default
+    elif not isinstance(limit, int):
+        try:
+            limit = int(limit)
+        except Exception:
+            limit = 10
+
+    if not item:
+        raise HTTPException(status_code=404, detail=f"Trending item with ID {item_id} not found.")
+
+    comments = get_or_create_item_comments(db, item, limit=limit)
+    return format_comments_response(comments)
+

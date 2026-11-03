@@ -86,6 +86,7 @@ INPUT STRINGS:
 
     gemini_rate_limiter.acquire()
     models_to_try = [
+        "gemini-3.5-flash",
         "gemini-3.8-flash",
         "gemini-flash-latest",
         "gemini-flash-lite-latest",

@@ -110,7 +110,7 @@ export async function renderAnalyticsView(container) {
           <div class="chart-card full-width">
             <div class="chart-card-header">
               <h3>24-Hour Ingestion Timeline</h3>
-              <span class="chart-badge">Volume (Hourly Buckets - Effective Time)</span>
+              <span class="chart-badge">Volume (Hourly Buckets)</span>
             </div>
             <div class="chart-canvas-container">
               <canvas id="chart-hourly-volume"></canvas>

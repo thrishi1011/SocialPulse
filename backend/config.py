@@ -25,7 +25,6 @@ class Settings:
     # Execution Modes
     MOCK_FETCH_MODE: bool = os.getenv("MOCK_FETCH_MODE", "true").lower() in ("true", "1", "yes")
     MOCK_AI_MODE: bool = os.getenv("MOCK_AI_MODE", "true").lower() in ("true", "1", "yes")
-    ENABLE_SAMPLE_COMMENTS: bool = os.getenv("ENABLE_SAMPLE_COMMENTS", "false").lower() in ("true", "1", "yes")
     # Comma-separated list of sources to run in LIVE mode even if MOCK_FETCH_MODE is true
     LIVE_SOURCES: list[str] = [
         s.strip().lower() for s in os.getenv(
@@ -36,8 +35,6 @@ class Settings:
 
     # Scheduler Settings
     PIPELINE_INTERVAL_MINUTES: int = int(os.getenv("PIPELINE_INTERVAL_MINUTES", "15"))
-    NEWS_WINDOW_DAYS: int = int(os.getenv("NEWS_WINDOW_DAYS", "7"))
-    POLITICS_TARGET_SHARE: float = float(os.getenv("POLITICS_TARGET_SHARE", "0.40"))
 
     # Reused Keys (from PulseDesk)
     NEWSAPI_KEY: str = os.getenv("NEWSAPI_KEY", "").strip()

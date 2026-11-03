@@ -34,9 +34,9 @@ CHART_SOURCES = ["youtube", "google_trends", "mastodon", "bluesky"]
 
 @router.get("/overview", response_model=AnalyticsOverviewResponse)
 def get_analytics_overview(
-    recency: Literal["6h", "12h", "24h", "3d", "7d", "30d", "all"] = Query(
+    recency: Literal["6h", "12h", "24h", "all"] = Query(
         "24h",
-        description="Recency window for analysis (6h, 12h, 24h, 3d, 7d, 30d, or all)"
+        description="Recency window for analysis (6h, 12h, 24h, or all)"
     ),
     db: Session = Depends(get_db)
 ):
@@ -47,14 +47,7 @@ def get_analytics_overview(
     - News coverage sources filter by COALESCE(published_at, fetched_at).
     """
     now = datetime.utcnow()
-    window_deltas = {
-        "6h": timedelta(hours=6),
-        "12h": timedelta(hours=12),
-        "24h": timedelta(hours=24),
-        "3d": timedelta(days=3),
-        "7d": timedelta(days=7),
-        "30d": timedelta(days=30),
-    }
+    hours_map = {"6h": 6, "12h": 12, "24h": 24}
 
     # Recency effective timestamp expression
     effective_time = case(
@@ -64,8 +57,8 @@ def get_analytics_overview(
 
     # Base filter criteria
     filters = []
-    if recency in window_deltas:
-        cutoff = now - window_deltas[recency]
+    if recency in hours_map:
+        cutoff = now - timedelta(hours=hours_map[recency])
         filters.append(effective_time >= cutoff)
 
     # 1. Category breakdown
@@ -156,21 +149,19 @@ def get_analytics_overview(
     )
     top_locations = [TopLocationItem(location=r.loc, count=r.count) for r in loc_rows]
 
-    # 5. Hourly volume for the last 24h based on effective_time (matching recency filter)
+    # 5. Hourly volume for the last 24h based on fetched_at (fill empty hours with 0)
     start_24h = (now - timedelta(hours=23)).replace(minute=0, second=0, microsecond=0)
     if is_sqlite:
-        hour_format = func.strftime("%Y-%m-%d %H:00", effective_time)
+        hour_format = func.strftime("%Y-%m-%d %H:00", TrendingItem.fetched_at)
     else:
-        hour_format = func.to_char(effective_time, "YYYY-MM-DD HH24:00")
+        hour_format = func.to_char(TrendingItem.fetched_at, "YYYY-MM-DD HH24:00")
 
     hour_query = (
         db.query(
             hour_format.label("hour_key"),
             func.count(TrendingItem.id).label("count")
         )
-        .select_from(TrendingItem)
-        .join(Source, TrendingItem.source_id == Source.id)
-        .filter(effective_time >= start_24h)
+        .filter(TrendingItem.fetched_at >= start_24h)
         .group_by(hour_format)
         .all()
     )

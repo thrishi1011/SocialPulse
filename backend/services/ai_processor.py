@@ -1,10 +1,8 @@
-import asyncio
 import json
 import logging
 import time
 from typing import Any
 import google.generativeai as genai
-from sqlalchemy import case
 from sqlalchemy.orm import Session
 
 from backend.config import settings
@@ -17,8 +15,13 @@ logger = logging.getLogger("socialpulse.ai_processor")
 
 PREFERRED_MODELS = [
     "gemini-3.5-flash",
-    "gemini-3.5-flash-lite",
-    "gemini-3.8-flash"
+    "gemini-3.8-flash",
+    "gemini-flash-latest",
+    "gemini-3.6-flash",
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash"
 ]
 
 BATCH_SIZE = 8
@@ -108,7 +111,6 @@ CRITICAL ACCURACY & CATEGORIZATION RULES:
 2. CREATOR & STREAMING CONTENT: Categorize video creators, streamers, Twitch drama, and gaming content as 'Gaming' or 'Entertainment'. NEVER categorize creator drama, bullying, or streaming spats as 'Health'.
 3. NO GENERIC BOILERPLATE: Write unique, insightful 1-2 sentence explanations specific to the actual headline and details provided. Do not use generic template phrases like 'Major trending story centered in...'.
 4. REAL LOCATIONS ONLY: location_india is ONLY filled when genuinely tied to that specific place in India. If global, international, or unmentioned, return null. Never guess or invent a location.
-5. POLITICS CATEGORIZATION: Any item discussing government actions, elections, political parties, ministers, members of parliament/legislature, courts, judiciary, policy regulations (e.g. IT Rules, blocking orders), or political leaders' social media activity, statements, or campaigns MUST be categorized as 'Politics'.
 
 Platform: {platform_name}
 Title/Headline: {title}
@@ -121,7 +123,7 @@ Context/Description: {description[:1200]}
                 model_name=model_name,
                 generation_config={"response_mime_type": "application/json"}
             )
-            response = model.generate_content(prompt, request_options={"timeout": 15.0})
+            response = model.generate_content(prompt)
             raw_text = response.text
             cleaned = clean_json_response(raw_text)
             data = json.loads(cleaned)
@@ -236,8 +238,7 @@ CRITICAL ACCURACY & CATEGORIZATION RULES:
 2. CREATOR & STREAMING CONTENT: Categorize video creators, streamers, Twitch drama, and gaming content as 'Gaming' or 'Entertainment'. NEVER categorize creator drama, bullying, or streaming spats as 'Health'.
 3. NO GENERIC BOILERPLATE: Write unique, insightful 1-2 sentence explanations specific to the actual headline and details provided. Do not use generic template phrases like 'Major trending story centered in...'.
 4. REAL LOCATIONS ONLY: location_india is ONLY filled when genuinely tied to that specific place in India. If global, international, or unmentioned, return null. Never guess or invent a location.
-5. POLITICS CATEGORIZATION: Any item discussing government actions, elections, political parties, ministers, members of parliament/legislature, courts, judiciary, policy regulations (e.g. IT Rules, blocking orders), or political leaders' social media activity, statements, or campaigns MUST be categorized as 'Politics'.
-6. STRICT ID MATCHING: Every item in the input MUST have a corresponding object in the returned JSON array with the exact input "id".
+5. STRICT ID MATCHING: Every item in the input MUST have a corresponding object in the returned JSON array with the exact input "id".
 
 ITEMS TO ANALYZE:
 {items_json_str}
@@ -256,7 +257,7 @@ ITEMS TO ANALYZE:
                 model_name=model_name,
                 generation_config={"response_mime_type": "application/json"}
             )
-            response = model.generate_content(prompt, request_options={"timeout": 15.0})
+            response = model.generate_content(prompt)
             raw_text = clean_json_response(response.text)
 
             # Attempt parsing
@@ -267,7 +268,7 @@ ITEMS TO ANALYZE:
                 logger.warning(f"Batch parse failure with {model_name}: {pe}. Retrying once...")
                 # Retry once on parse failure
                 gemini_rate_limiter.acquire()
-                retry_resp = model.generate_content(prompt, request_options={"timeout": 15.0})
+                retry_resp = model.generate_content(prompt)
                 retry_text = clean_json_response(retry_resp.text)
                 data = json.loads(retry_text)
 
@@ -333,20 +334,9 @@ async def process_unprocessed_items(db: Session, limit: int = 50) -> tuple[int, 
     Process un-summarized trending items in batches of 8-10 with Gemini AI.
     Returns: (total_attempted, succeeded, failed)
     """
-    # Prioritize items with Politics heuristic or high leaderboard rank
-    is_politics = case((Category.name == "Politics", 1), else_=0)
-    items = (
-        db.query(TrendingItem)
-        .outerjoin(Category, TrendingItem.category_id == Category.id)
-        .filter(TrendingItem.ai_processed == False)
-        .order_by(
-            is_politics.desc(),
-            TrendingItem.rank.asc().nullslast(),
-            TrendingItem.fetched_at.desc()
-        )
-        .limit(limit)
-        .all()
-    )
+    items = db.query(TrendingItem).filter(
+        TrendingItem.ai_processed == False
+    ).limit(limit).all()
 
     if not items:
         return (0, 0, 0)
@@ -362,7 +352,7 @@ async def process_unprocessed_items(db: Session, limit: int = 50) -> tuple[int, 
     # Process items in batches of 8
     for i in range(0, len(items), BATCH_SIZE):
         batch = items[i:i + BATCH_SIZE]
-        batch_results = await asyncio.to_thread(analyze_batch_with_gemini, batch)
+        batch_results = analyze_batch_with_gemini(batch)
 
         for item in batch:
             analysis = batch_results.get(item.id)

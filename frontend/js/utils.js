@@ -50,7 +50,6 @@ export function truncate(str, maxLength = 140) {
   return str.substring(0, maxLength).trim() + "...";
 }
 
-
 export function getInitials(name) {
   if (!name) return "?";
   const parts = name.trim().replace(/^[@u\/]+/, "").split(/[\s_.]+/);
@@ -76,13 +75,13 @@ export function getPlatformBadge(platform) {
 export function getSentimentBadge(sentiment) {
   const s = (sentiment || "neutral").toLowerCase();
   const map = {
-    positive: { label: "Positive", icon: "\u{1F7E2}", class: "sentiment-positive" },
-    excited: { label: "Excited", icon: "\u{1F525}", class: "sentiment-excited" },
-    curious: { label: "Curious", icon: "\u{1F4A1}", class: "sentiment-curious" },
-    critical: { label: "Critical", icon: "\u26A0\uFE0F", class: "sentiment-critical" },
-    neutral: { label: "Neutral", icon: "\u26AA", class: "sentiment-neutral" }
+    positive: { label: "Positive", icon: "🟢", class: "sentiment-positive" },
+    excited: { label: "Excited", icon: "🔥", class: "sentiment-excited" },
+    curious: { label: "Curious", icon: "💡", class: "sentiment-curious" },
+    critical: { label: "Critical", icon: "⚠️", class: "sentiment-critical" },
+    neutral: { label: "Neutral", icon: "⚪", class: "sentiment-neutral" }
   };
-  return map[s] || { label: sentiment, icon: "\u26AA", class: "sentiment-neutral" };
+  return map[s] || { label: sentiment, icon: "⚪", class: "sentiment-neutral" };
 }
 
 export function renderSentimentBreakdownHTML(breakdown = {}, total = 0) {
@@ -115,7 +114,6 @@ export function renderCommentCardHTML(c) {
   const sBadge = getSentimentBadge(c.sentiment);
   const initials = getInitials(c.author);
   const avatarBg = c.author_avatar_color || "#3b82f6";
-  const isGenerated = c.is_generated !== false;
 
   return `
     <div class="comment-card" id="comment-${c.id}">
@@ -130,7 +128,6 @@ export function renderCommentCardHTML(c) {
           </div>
         </div>
         <div class="comment-meta-badges">
-          ${isGenerated ? '<span class="comment-generated-badge">SAMPLE / GENERATED COMMENTS</span>' : ''}
           <span class="comment-platform-badge ${pBadge.class}">${pBadge.label}</span>
           <span class="comment-time">${timeAgo(c.published_at || c.created_at)}</span>
         </div>
@@ -138,7 +135,7 @@ export function renderCommentCardHTML(c) {
       <p class="comment-text">${escapeHTML(c.content)}</p>
       <div class="comment-card-footer">
         <div class="comment-engagement">
-          <span class="upvote-icon">\u25B2</span>
+          <span class="upvote-icon">▲</span>
           <strong>${formatNumber(c.upvotes) || '0'}</strong>
           <span class="engagement-sub">reactions</span>
         </div>
@@ -149,3 +146,4 @@ export function renderCommentCardHTML(c) {
     </div>
   `;
 }
+

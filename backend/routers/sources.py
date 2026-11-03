@@ -15,19 +15,11 @@ router = APIRouter(prefix="/api/v1/sources", tags=["sources"])
 
 @router.get("", response_model=SourceListResponse)
 def list_sources(db: Session = Depends(get_db)):
-    """Retrieve all available data sources with their category, enablement status, and item counts."""
+    """Retrieve all available data sources with their category and enablement status."""
     sources = db.query(Source).order_by(Source.source_category.asc(), Source.id.asc()).all()
-    # Compute per-source item counts
-    counts = dict(db.query(TrendingItem.source_id, func.count(TrendingItem.id)).group_by(TrendingItem.source_id).all())
-    result_sources = []
-    for s in sources:
-        sr = SourceResponse.model_validate(s)
-        sr.item_count = counts.get(s.id, 0)
-        result_sources.append(sr)
-
     return SourceListResponse(
         total_sources=len(sources),
-        sources=result_sources
+        sources=[SourceResponse.model_validate(s) for s in sources]
     )
 
 @router.get("/health", response_model=SourceHealthResponse)

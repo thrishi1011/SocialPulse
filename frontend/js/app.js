@@ -180,11 +180,10 @@ function renderSourceTabs() {
 
   const catASources = state.sources.filter(s => s.source_category === "A");
   const catBSources = state.sources.filter(s => s.source_category === "B");
-  const totalCount = state.sources.reduce((sum, s) => sum + (s.item_count || 0), 0);
 
   let html = `
     <button class="source-tab ${state.activeSource === "all" ? "active" : ""}" data-slug="all">
-      <span>All Sources <span class="tab-count" style="font-size: 11px; opacity: 0.75; font-family: var(--font-mono, monospace);">(${totalCount})</span></span>
+      <span>All Sources</span>
     </button>
   `;
 
@@ -194,7 +193,7 @@ function renderSourceTabs() {
       html += `
         <button class="source-tab ${isActive}" data-slug="${escapeHTML(s.slug)}" data-cat="A">
           <img src="/static/assets/icons/${escapeHTML(s.icon_filename || 'youtube.svg')}" alt="" />
-          <span>${escapeHTML(s.display_name)} <span class="tab-count" style="font-size: 11px; opacity: 0.75; font-family: var(--font-mono, monospace);">(${s.item_count || 0})</span></span>
+          <span>${escapeHTML(s.display_name)}</span>
           <span class="tab-indicator"></span>
         </button>
       `;
@@ -211,7 +210,7 @@ function renderSourceTabs() {
       html += `
         <button class="source-tab cat-b-tab ${isActive}" data-slug="${escapeHTML(s.slug)}" data-cat="B">
           <img src="/static/assets/icons/${escapeHTML(s.icon_filename || 'google-trends.svg')}" alt="" />
-          <span>${escapeHTML(s.display_name)} <span class="tab-count" style="font-size: 11px; opacity: 0.75; font-family: var(--font-mono, monospace);">(${s.item_count || 0})</span></span>
+          <span>${escapeHTML(s.display_name)}</span>
           <span class="tab-indicator" style="background: var(--cat-b-amber);"></span>
         </button>
       `;
@@ -306,11 +305,7 @@ function renderTrendsGrid() {
   }
 
   if (counter) {
-    if (state.windowWidenedTo) {
-      counter.innerHTML = `Showing ${displayItems.length} of ${state.total} items <span class="widened-badge" style="margin-left: 8px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 2px 8px; border-radius: 9999px; font-size: 11px; border: 1px solid rgba(245, 158, 11, 0.3);">ℹ️ Showing last ${escapeHTML(state.windowWidenedTo)} (only ${state.originalWindowCount ?? 0} in ${escapeHTML(state.recency)})</span>`;
-    } else {
-      counter.innerText = `Showing ${displayItems.length} of ${state.total} items`;
-    }
+    counter.innerText = `Showing ${displayItems.length} of ${state.total} items`;
   }
 
   let html = "";
@@ -498,7 +493,7 @@ async function openDetailDrawer(itemId) {
     const [item, history, commentsData] = await Promise.all([
       api.getTrendById(itemId),
       api.getTrendHistory(itemId).catch(() => ({ snapshots: [] })),
-      api.getItemComments(itemId, 10).catch(() => ({ total: 0, comments: [], sentiment_breakdown: {}, is_generated: true }))
+      api.getItemComments(itemId, 10).catch(() => ({ total: 0, comments: [], sentiment_breakdown: {} }))
     ]);
     const isCatA = item.source_category === "A";
 
@@ -596,14 +591,12 @@ async function openDetailDrawer(itemId) {
         `}
       </div>
 
-
-      <!-- Sourced Community Reactions & Comments Section (Top 10) -->
+      <!-- Sourced Community Reactions & Comments Section -->
       <div class="drawer-comments-section">
         <div class="drawer-comments-header">
           <div class="drawer-comments-title-wrap">
             <span class="drawer-comments-title">💬 Sourced Community Reactions</span>
             <span class="comments-count-pill">${commentsData.total || 0} reactions</span>
-            ${commentsData.is_generated !== false ? '<span class="generated-badge">SAMPLE / GENERATED COMMENTS</span>' : ''}
           </div>
           <div class="comments-sentiment-strip">
             ${renderSentimentBreakdownHTML(commentsData.sentiment_breakdown, commentsData.total)}
@@ -726,8 +719,6 @@ async function fetchAndRenderTrends() {
     state.items = data.items;
     state.total = data.total;
     state.totalPages = data.total_pages;
-    state.windowWidenedTo = data.window_widened_to || data.filters_applied?.window_widened_to;
-    state.originalWindowCount = data.original_window_count !== undefined ? data.original_window_count : data.filters_applied?.original_window_count;
 
     renderTrendsGrid();
     renderPagination();

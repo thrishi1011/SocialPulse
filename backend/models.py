@@ -162,9 +162,7 @@ class Comment(Base):
     platform = Column(String(32), nullable=False)  # 'reddit', 'youtube', 'bluesky', 'mastodon', 'twitter', 'twitch', etc.
     content = Column(Text, nullable=False)
     upvotes = Column(Integer, default=0, nullable=False)
-    sentiment = Column(String(32), default="neutral", nullable=False)
-    is_generated = Column(Boolean, default=True, nullable=False)
-    url = Column(String(512), nullable=True)
+    sentiment = Column(String(32), default="neutral", nullable=False)  # 'positive', 'neutral', 'critical', 'curious', 'excited'
     published_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 

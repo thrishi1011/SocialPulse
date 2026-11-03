@@ -42,6 +42,21 @@ logger = logging.getLogger("socialpulse.clustering")
 
 clustering_lock = asyncio.Lock()
 
+def _generate_with_gemini(prompt: str) -> str:
+    """Generate content trying preferred Gemini models in order."""
+    import google.generativeai as genai
+    models_to_try = ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.6-flash", "gemini-2.5-flash"]
+    last_err = None
+    for model_name in models_to_try:
+        try:
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(prompt)
+            return response.text.strip()
+        except Exception as e:
+            last_err = e
+            continue
+    raise last_err or RuntimeError("No Gemini model available")
+
 STOPWORDS = {
     "the", "a", "an", "in", "on", "at", "by", "for", "with", "about",
     "against", "between", "into", "through", "during", "before", "after",
@@ -115,7 +130,7 @@ class UnionFind:
             self.rank[rx] += 1
 
 
-def cluster_by_jaccard_heuristic(items: list[TrendingItem], threshold: float = 0.5) -> list[dict[str, Any]]:
+def cluster_by_jaccard_heuristic(items: list[TrendingItem], threshold: float = 0.25) -> list[dict[str, Any]]:
     """
     Compute pairwise Jaccard similarities on candidate items and build groups via Union-Find.
     Pure, deterministic fallback when Gemini is unavailable.
@@ -274,9 +289,7 @@ Return ONLY a valid JSON array matching this format (no markdown code blocks, no
         for attempt in range(2):  # Retry once on JSON failure
             try:
                 gemini_rate_limiter.acquire()
-                model = genai.GenerativeModel("gemini-3.8-flash")
-                response = model.generate_content(prompt)
-                raw_text = response.text.strip()
+                raw_text = _generate_with_gemini(prompt)
                 if raw_text.startswith("```json"):
                     raw_text = raw_text[7:]
                 elif raw_text.startswith("```"):
@@ -336,9 +349,7 @@ Return ONLY a valid JSON array:
 """
     try:
         gemini_rate_limiter.acquire()
-        model = genai.GenerativeModel("gemini-3.8-flash")
-        res = model.generate_content(prompt)
-        text = res.text.strip()
+        text = _generate_with_gemini(prompt)
         if text.startswith("```json"):
             text = text[7:]
         elif text.startswith("```"):
