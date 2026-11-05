@@ -91,28 +91,36 @@ python -m backend.seed
 ### 6. Start the server
 
 ```bash
-python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+# Recommended command (works reliably across Windows, macOS, and Linux):
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 ```
+
+> **Note for Windows users:** Always run with `python -m uvicorn ...` instead of bare `uvicorn ...`. This ensures Python executes directly from your active virtual environment, avoiding `The term 'uvicorn' is not recognized` or `CommandNotFoundException` errors.
 
 Wait for `Application startup complete.`, then open:
 
 | URL | What it is |
 | :--- | :--- |
-| http://localhost:8000 | Dashboard |
-| http://localhost:8000/docs | Interactive API docs (Swagger) |
-| http://localhost:8000/health | Health check (shows mock/live mode) |
+| http://localhost:8000 or http://127.0.0.1:8000 | Dashboard UI |
+| http://localhost:8000/docs | Interactive API docs (Swagger UI) |
+| http://localhost:8000/health | System health check (shows mock/live status) |
 
-**Note:** The page opens immediately. If the database is empty or the data is older than 12 hours, the first data load runs in the background, so cards may take a minute or two to appear. Refresh the page after a short wait.
+**Note:** The page opens immediately. If the database is empty or data is older than 12 hours, the initial data ingestion runs seamlessly in the background so the server is never blocked. Cards will populate automatically; simply refresh the page.
 
 ### Running it again later
 
-From the project folder, with the virtual environment active:
+Whenever you return to the project:
 
-```bash
-python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
-```
+1. Open a terminal in the project directory (`cd SocialPulse`).
+2. Activate your virtual environment:
+   - **Windows (PowerShell):** `.\venv\Scripts\Activate.ps1`
+   - **Linux / macOS:** `source venv/bin/activate`
+3. Launch the server:
+   ```bash
+   python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+   ```
 
-Stop the server with `Ctrl+C`.
+Stop the server anytime with `Ctrl+C`.
 
 ---
 
@@ -126,6 +134,7 @@ Stop the server with `Ctrl+C`.
 - **Analytics dashboard.** Category breakdown, platform share, data provenance ratio, top locations, a 24-hour volume timeline, and AI coverage, all computed with SQL aggregates.
 - **Source Health.** Live status for every source: last fetch, duration, 24-hour success rate, recent logs, and a "Run now" button.
 - **Watchlist, bookmarks and CSV export.** Keyword watchlist and saved items (stored in your browser's `localStorage`), and a CSV export of the current filtered view with formula-injection protection.
+- **Community Discussions & Sentiment.** Real top-level comments for YouTube videos via YouTube Data API v3 with upvote ranking and automated sentiment categorization (positive, neutral, critical, curious, excited). Macro stories include cross-platform community reaction synthesis.
 - **Scheduler.** Background jobs fetch each source on its own interval, run the AI sweep, cluster stories, and prune old snapshots.
 
 ---
@@ -236,6 +245,7 @@ All settings are environment variables, read from `.env` (copy `.env.example`).
 | `MOCK_AI_MODE` | `true` | `true` uses keyword heuristics instead of Gemini. |
 | `LIVE_SOURCES` | all 9 sources | Comma-separated sources that always run live. **Set it empty (`LIVE_SOURCES=`) to force sample data.** |
 | `GEMINI_KEY` | empty | Google Gemini API key for AI summaries and clustering. |
+| `GEMINI_KEY_SCRAP` | empty | Optional secondary Gemini API key specifically for Category B news discovery and fallback enrichment, isolating news scraping from core AI quotas. |
 | `YOUTUBE_API_KEY` | empty | YouTube Data API v3 key. Without it YouTube falls back to sample data. |
 | `DATABASE_URL` | empty | PostgreSQL URL for persistent history. Empty uses local SQLite. |
 | `DB_PATH` | `socialpulse.db` | SQLite file name when `DATABASE_URL` is empty. |
@@ -349,9 +359,11 @@ Interactive documentation is at `/docs`. All paths are under `/api/v1` unless no
 | `GET` | `/trends` | List items. Filters: `source` (repeatable), `source_category` (A/B), `category`, `recency` (6h/12h/24h/all), `region_scope` (all/india/global/local), `sort` (recency/engagement/momentum), `page`, `per_page` |
 | `GET` | `/trends/{id}` | Full item details with trending region and momentum |
 | `GET` | `/trends/{id}/history` | Snapshot series (rank and engagement over time) |
+| `GET` | `/trends/{id}/comments` | Sourced community comments and sentiment breakdown for a trending item |
 | `GET` | `/trends/export.csv` | CSV export using the same filters as `/trends` |
 | `GET` | `/topics` | Macro stories. Params: `min_sources` (default 2), `recency` |
 | `GET` | `/topics/{id}` | One story with all member items |
+| `GET` | `/topics/{id}/comments` | Cross-platform discussion reactions for a macro story topic |
 | `GET` | `/analytics/overview` | Aggregates: category breakdown, platform share, provenance ratio, top locations, hourly volume, AI coverage. Param: `recency` |
 | `GET` | `/sources` | All sources and their configuration |
 | `GET` | `/sources/health` | Health state, 24h success rate and last fetch for every source |
@@ -409,7 +421,7 @@ Some files are leftovers from earlier versions and are not used by the current 9
 ## Testing
 
 ```bash
-python -m pytest test_phase1.py test_phase2.py test_phase3.py test_e2e.py test_phase8.py -v
+python -m pytest test_phase1.py test_phase2.py test_phase3.py test_e2e.py test_phase8.py test_comments.py -v
 ```
 
 All tests run offline in mock mode and make no real Gemini calls.
@@ -421,6 +433,7 @@ All tests run offline in mock mode and make no real Gemini calls.
 | `test_phase3.py` | Frontend delivery, static assets, platform icons |
 | `test_e2e.py` | Cold-start pipeline across all sources |
 | `test_phase8.py` | Momentum states, clustering validation, analytics, source health, CSV injection guard |
+| `test_comments.py` | Community comments, YouTube comment thread retrieval, sentiment classification, topic reactions |
 
 `test_phase7.py` calls the **real Gemini API** and needs a valid `GEMINI_KEY`. It is not part of the offline suite.
 

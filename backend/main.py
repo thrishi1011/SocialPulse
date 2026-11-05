@@ -64,35 +64,50 @@ async def _start_ipv6_proxy():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 1. Startup: Initialize and seed database
+    # 1. Startup: Initialize and seed database quickly (<50ms)
     init_db()
     db = SessionLocal()
     try:
         seed_db(db)
-
-        from datetime import datetime, timedelta
-        # Freshness check: ensure all enabled platforms have recent items within the last 12 hours
-        now = datetime.utcnow()
-        recent_cutoff = now - timedelta(hours=12)
-        enabled_sources = db.query(Source).filter(Source.is_enabled == True).all()
-
-        needs_refresh = False
-        for s in enabled_sources:
-            s_count = db.query(TrendingItem).filter(
-                TrendingItem.source_id == s.id,
-                TrendingItem.fetched_at >= recent_cutoff
-            ).count()
-            if s_count == 0:
-                needs_refresh = True
-                break
-
-        if needs_refresh or db.query(TrendingItem).count() == 0:
-            print("[Startup] Platform feeds are missing or older than 12h. Running comprehensive startup fetch sweep...")
-            await run_pipeline(db, force_live=False)
-            await process_unprocessed_items(db, limit=100)
-            print(f"[Startup] Ingestion completed. DB now contains {db.query(TrendingItem).count()} items across all platforms.")
     finally:
         db.close()
+
+    bg_sweep_task = None
+    if not settings.MOCK_FETCH_MODE:
+        async def _bg_startup_sweep():
+            # Wait briefly so uvicorn binds to port 8000 and serves web requests immediately
+            await asyncio.sleep(1)
+            sweep_db = SessionLocal()
+            try:
+                from datetime import datetime, timedelta
+                now = datetime.utcnow()
+                recent_cutoff = now - timedelta(hours=12)
+                enabled_sources = sweep_db.query(Source).filter(Source.is_enabled == True).all()
+
+                needs_refresh = False
+                for s in enabled_sources:
+                    s_count = sweep_db.query(TrendingItem).filter(
+                        TrendingItem.source_id == s.id,
+                        TrendingItem.fetched_at >= recent_cutoff
+                    ).count()
+                    min_expected = 50 if s.slug == "youtube" else (15 if "news" in s.slug else 1)
+                    if s_count < min_expected:
+                        needs_refresh = True
+                        break
+
+                if needs_refresh or sweep_db.query(TrendingItem).count() == 0:
+                    print("[Startup Background] Platform feeds missing or older than 12h. Running background ingestion sweep...")
+                    await run_pipeline(sweep_db, force_live=False)
+                    await process_unprocessed_items(sweep_db, limit=50)
+                    print(f"[Startup Background] Ingestion complete. DB contains {sweep_db.query(TrendingItem).count()} items.")
+            except asyncio.CancelledError:
+                pass
+            except Exception as e:
+                print(f"[Startup Background] Notice: {e}")
+            finally:
+                sweep_db.close()
+
+        bg_sweep_task = asyncio.create_task(_bg_startup_sweep())
 
     # 2. Start APScheduler background jobs
     start_scheduler()
@@ -101,6 +116,14 @@ async def lifespan(app: FastAPI):
     yield
 
     # 3. Shutdown
+    if bg_sweep_task:
+        bg_sweep_task.cancel()
+        try:
+            await bg_sweep_task
+        except asyncio.CancelledError:
+            pass
+        except Exception:
+            pass
     stop_scheduler()
     if proxy_server:
         proxy_server.close()

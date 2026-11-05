@@ -1,22 +1,242 @@
 [
   {
-    "source": {"id": "indian-express", "name": "The Indian Express"},
-    "author": "Express News Service",
-    "title": "Kerala flood relief volunteers mobilize emergency medicine network across Wayanad via Facebook",
-    "description": "Civic volunteers in Wayanad, Kerala organized a rapid medicine delivery hub through local Facebook groups to assist landslide-affected families.",
-    "url": "https://indianexpress.com/article/trending/kerala-wayanad-flood-relief-facebook-groups/",
-    "urlToImage": "https://images.unsplash.com/photo-1547683905-f686c993aae5?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-08-26T17:15:00Z",
-    "content": "Decentralized community groups on Facebook mobilized hundreds of volunteers across Kerala within hours."
+    "source": {
+      "name": "Social Media Today"
+    },
+    "author": "via Social Media Today",
+    "title": "Meta delays commercial terms update indefinitely",
+    "description": "The company's upcoming commercial terms of service update has prompted regulators to seek more insight into the specific details.",
+    "url": "https://www.socialmediatoday.com/news/meta-delays-commercial-terms-update-indefinitely/873528/",
+    "urlToImage": null,
+    "publishedAt": "2026-11-02T22:46:42Z",
+    "content": "Meta delays commercial terms update indefinitely"
   },
   {
-    "source": {"id": "news18", "name": "News18"},
-    "author": "Buzz Desk",
-    "title": "New Delhi heritage preservation group on Facebook uncovers forgotten Mughal stepwell",
-    "description": "Archaeology enthusiasts collaborating on a Facebook community page discovered historic water structures near Mehrauli in New Delhi.",
-    "url": "https://www.news18.com/buzz/new-delhi-facebook-group-heritage-discovery-2026.html",
-    "urlToImage": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-08-26T11:00:00Z",
-    "content": "Citizens from across the national capital are visiting the restored site following the viral post."
+    "source": {
+      "name": "Social Media Today"
+    },
+    "author": "via Social Media Today",
+    "title": "Meta updates creator assistant chatbot",
+    "description": "The company’s artificial intelligence-powered tool now features opportunity alerts, better help for content creation and automated replies.",
+    "url": "https://www.socialmediatoday.com/news/meta-updates-creator-assistant-chatbot/873524/",
+    "urlToImage": null,
+    "publishedAt": "2026-11-02T22:25:51Z",
+    "content": "Meta updates creator assistant chatbot"
+  },
+  {
+    "source": {
+      "name": "Social Media Today"
+    },
+    "author": "via Social Media Today",
+    "title": "Instagram offers to pay creators for long-form content",
+    "description": "Creators were offered as much as $500,000 to post videos to Meta’s new Features product, according to Business Insider.",
+    "url": "https://www.socialmediatoday.com/news/instagram-offers-to-pay-creators-for-long-form-content/873402/",
+    "urlToImage": "https://imgproxy.divecdn.com/hIUIo3PXvdugDyfozSvrzAFzzL4CScua7W_PhwqRdlk/g:ce/rs:fill:1600:900:1/Z3M6Ly9kaXZlc2l0ZS1zdG9yYWdlL2RpdmVpbWFnZS9pbnN0YWdyYW1fZmVhdHVyZXMucG5n.webp",
+    "publishedAt": "2026-11-01T22:29:02Z",
+    "content": "Instagram offers to pay creators for long-form content"
+  },
+  {
+    "source": {
+      "name": "The Hindu"
+    },
+    "author": "via The Hindu",
+    "title": "‘Unavailable in India’: Why are social media posts being blocked amid protests? | Explained",
+    "description": "MeitY’s advisory to Meta, shorter takedown deadlines under amended IT Rules, and platforms’ own enforcement policies have brought renewed scrutiny of how online content is blocked, and what recourse users have",
+    "url": "https://www.thehindu.com/news/national/why-are-social-media-posts-being-blocked-in-india-amid-protests-explained/article71643710.ece",
+    "urlToImage": "https://th-i.thgim.com/public/incoming/luuuzt/article71643733.ece/alternates/LANDSCAPE_1200/2026-01-27T094908Z_1686426464_RC2QCIAJZZAQ_RTRMADP_3_INDIA-SOCIALMEDIA-CHILDREN.JPG",
+    "publishedAt": "2026-11-01T06:27:47Z",
+    "content": "‘Unavailable in India’: Why are social media posts being blocked amid protests? | Explained"
+  },
+  {
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via News Outlet",
+    "title": "Meta Introduces New Reel-to-Feed Algorithm Changes Sparking Creator Debate",
+    "description": "Content creators worldwide are reacting to Meta's latest algorithm updates that prioritize community recommendations over traditional follower feeds on Facebook.",
+    "url": "https://techcrunch.com/2026/05/10/meta-new-reel-feed-algorithm-creators/",
+    "publishedAt": "2026-05-12T08:30:00Z",
+    "content": "Meta Introduces New Reel-to-Feed Algorithm Changes Sparking Creator Debate",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via News Outlet",
+    "title": "Viral Facebook Marketplace Scam Targets Festive Shoppers Across Indian Metros",
+    "description": "Cyber cell authorities in India issue warnings following a viral trend of fraudulent electronics listings on Facebook Marketplace across Delhi and Mumbai.",
+    "url": "https://indianexpress.com/article/technology/tech-news-technology/facebook-marketplace-scam-cyber-cell-warning-9871234/",
+    "publishedAt": "2026-05-11T14:15:00Z",
+    "content": "Viral Facebook Marketplace Scam Targets Festive Shoppers Across Indian Metros",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Mint"
+    },
+    "author": "via News Outlet",
+    "title": "Meta Faces Antitrust Scrutiny Over Facebook Ad Targeting Practices in India",
+    "description": "Regulators step up inquiries into targeted advertising transparency on Facebook, following complaints from local consumer advocacy groups.",
+    "url": "https://www.livemint.com/industry/technology/meta-antitrust-scrutiny-facebook-ad-targeting-india-11715400000.html",
+    "publishedAt": "2026-05-10T11:00:00Z",
+    "content": "Meta Faces Antitrust Scrutiny Over Facebook Ad Targeting Practices in India",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "BBC"
+    },
+    "author": "via News Outlet",
+    "title": "Global Outcry Over Deepfake Political Ads Circulating Widely on Facebook",
+    "description": "Electoral watchdogs demand immediate action from Meta as AI-generated deepfake videos of politicians trend across Facebook groups worldwide.",
+    "url": "https://www.bbc.com/news/technology-68901234",
+    "publishedAt": "2026-05-09T09:45:00Z",
+    "content": "Global Outcry Over Deepfake Political Ads Circulating Widely on Facebook",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "India Today"
+    },
+    "author": "via News Outlet",
+    "title": "Nostalgia Trend: '10 Years Ago on Facebook' Memories Resurface Among Millennial Users",
+    "description": "A viral wave of nostalgic photo archives is sweeping through Indian Facebook feeds as users reminisce about early digital community milestones.",
+    "url": "https://www.indiatoday.in/technology/news/story/facebook-memories-nostalgia-trend-millennials-254123-2026-05-08",
+    "publishedAt": "2026-05-08T16:20:00Z",
+    "content": "Nostalgia Trend: '10 Years Ago on Facebook' Memories Resurface Among Millennial Users",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Times of India"
+    },
+    "author": "via News Outlet",
+    "title": "Regional Language Content Surges on Facebook India, Outpacing English Engagement",
+    "description": "New data released by Meta highlights a massive spike in regional video consumption and community group interactions in Hindi, Tamil, and Telugu.",
+    "url": "https://timesofindia.indiatimes.com/technology/tech-news/regional-language-content-surges-on-facebook-india/articleshow/99887766.cms",
+    "publishedAt": "2026-05-07T12:00:00Z",
+    "content": "Regional Language Content Surges on Facebook India, Outpacing English Engagement",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "NDTV"
+    },
+    "author": "via News Outlet",
+    "title": "Facebook Gaming Creators in India Pivot to Live Streaming Educational Content",
+    "description": "Top gaming streamers on Facebook India are successfully transitioning their communities toward interactive trivia and educational live-stream formats.",
+    "url": "https://www.ndtv.com/technology/facebook-gaming-creators-india-pivot-live-streaming-5812345",
+    "publishedAt": "2026-05-06T15:30:00Z",
+    "content": "Facebook Gaming Creators in India Pivot to Live Streaming Educational Content",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via News Outlet",
+    "title": "Meta Expands AI Chatbot Integration Across Facebook Messenger and Groups",
+    "description": "Users report mixed reactions as Meta rolls out automated community moderation tools powered by generative AI inside large Facebook Groups.",
+    "url": "https://techcrunch.com/2026/05/05/meta-expands-ai-chatbot-facebook-messenger-groups/",
+    "publishedAt": "2026-05-05T10:10:00Z",
+    "content": "Meta Expands AI Chatbot Integration Across Facebook Messenger and Groups",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "BBC"
+    },
+    "author": "via News Outlet",
+    "title": "European Union Investigates Facebook's Moderation Policies on Viral Content",
+    "description": "EU regulators have requested compliance data from Meta regarding the rapid spread of unverified viral news snippets on Facebook's main feed.",
+    "url": "https://www.bbc.com/news/world-europe-68899887",
+    "publishedAt": "2026-05-04T13:50:00Z",
+    "content": "European Union Investigates Facebook's Moderation Policies on Viral Content",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Mint"
+    },
+    "author": "via News Outlet",
+    "title": "Small Businesses in Tier-2 Indian Cities Drive Facebook Ad Revenue Growth",
+    "description": "A recent industry report underscores how local merchants in smaller Indian towns are heavily utilizing Facebook Ads Manager for localized customer acquisition.",
+    "url": "https://www.livemint.com/companies/news/small-businesses-tier-2-cities-facebook-ad-revenue-11715000000.html",
+    "publishedAt": "2026-05-03T07:25:00Z",
+    "content": "Small Businesses in Tier-2 Indian Cities Drive Facebook Ad Revenue Growth",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via News Outlet",
+    "title": "Viral Facebook Reel Challenge Sparks Environmental Cleanup Drives in Bengaluru",
+    "description": "An organic community challenge initiated via a Facebook group has mobilized hundreds of volunteers to clean up local lakes in Bengaluru.",
+    "url": "https://indianexpress.com/article/cities/bangalore/facebook-reel-challenge-environmental-cleanup-bengaluru-9865432/",
+    "publishedAt": "2026-05-02T17:00:00Z",
+    "content": "Viral Facebook Reel Challenge Sparks Environmental Cleanup Drives in Bengaluru",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "India Today"
+    },
+    "author": "via News Outlet",
+    "title": "Meta Updates Facebook Privacy Controls After Global User Feedback Initiative",
+    "description": "In response to widespread community discussions regarding data privacy, Meta has introduced simplified one-click visibility controls for older posts.",
+    "url": "https://www.indiatoday.in/technology/news/story/meta-updates-facebook-privacy-controls-user-feedback-253999-2026-05-01",
+    "publishedAt": "2026-05-01T11:40:00Z",
+    "content": "Meta Updates Facebook Privacy Controls After Global User Feedback Initiative",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Times of India"
+    },
+    "author": "via News Outlet",
+    "title": "Fake Celebrity Endorsement Ads on Facebook Prompt Legal Action in India",
+    "description": "Prominent Indian actors and public figures are taking collective legal measures against unauthorized promotional ads running across Facebook.",
+    "url": "https://timesofindia.indiatimes.com/india/fake-celebrity-endorsement-ads-facebook-legal-action/articleshow/99776655.cms",
+    "publishedAt": "2026-04-30T16:00:00Z",
+    "content": "Fake Celebrity Endorsement Ads on Facebook Prompt Legal Action in India",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via News Outlet",
+    "title": "Facebook Groups See Massive Growth in Collaborative AI Prompt Sharing Communities",
+    "description": "Tech enthusiasts worldwide are flocking to niche Facebook groups dedicated to sharing, testing, and optimizing generative AI prompts.",
+    "url": "https://techcrunch.com/2026/04/29/facebook-groups-growth-collaborative-ai-prompt-sharing/",
+    "publishedAt": "2026-04-29T10:00:00Z",
+    "content": "Facebook Groups See Massive Growth in Collaborative AI Prompt Sharing Communities",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "NDTV"
+    },
+    "author": "via News Outlet",
+    "title": "Viral Heritage Recipe Trend Takes Over Facebook Food Creator Communities",
+    "description": "Home chefs and culinary creators across India are gaining massive followings by sharing ancestral family recipes through viral Facebook Reels.",
+    "url": "https://www.ndtv.com/food/viral-heritage-recipe-trend-facebook-food-creators-5801234",
+    "publishedAt": "2026-04-28T14:30:00Z",
+    "content": "Viral Heritage Recipe Trend Takes Over Facebook Food Creator Communities",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Times of India"
+    },
+    "author": "via Times of India",
+    "title": "Amazon bans Meta's Muse over 'safety concerns', then CEO Andy Jassy says: Few customers are doing much shopping this way yet, as the...",
+    "description": "Verified report from Times of India covering trending content on Facebook.",
+    "url": "https://timesofindia.indiatimes.com/technology/tech-news/amazon-bans-metas-muse-over-safety-concerns-then-ceo-andy-jassy-says-few-customers-are-doing-much-shopping-this-way-yet-as-the-/articleshow/135455562.cms",
+    "urlToImage": null,
+    "publishedAt": null,
+    "content": "Amazon bans Meta's Muse over 'safety concerns', then CEO Andy Jassy says: Few customers are doing much shopping this way yet, as the..."
   }
 ]

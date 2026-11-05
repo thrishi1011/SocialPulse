@@ -1,42 +1,242 @@
 [
   {
-    "source": {"id": "news18", "name": "News18"},
-    "author": "Trending Desk",
-    "title": "Bengaluru traffic police viral tweet on AI signal synchronization earns praise across Karnataka",
-    "description": "A viral Twitter thread from the Bengaluru Traffic Police demonstrating an 18% reduction in bottleneck delays in Karnataka was widely shared.",
-    "url": "https://www.news18.com/buzz/bengaluru-traffic-police-viral-tweet-ai-signals-2026.html",
-    "urlToImage": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T11:30:00Z",
-    "content": "Commuters in Bengaluru praised the transparent engineering data shared in the thread."
+    "source": {
+      "name": "9to5Mac"
+    },
+    "author": "via 9to5Mac",
+    "title": "X for iPhone and iPad just added over a dozen new app icon options",
+    "description": "Since X was called Twitter, the iPhone and iPad app has supported changing the default app icon to something with a bit more flair. Today’s app update overhauls the alternative icon set with more than a dozen new options.more…",
+    "url": "https://9to5mac.com/2026/11/02/x-for-iphone-and-ipad-just-dropped-a-dozen-new-app-icon-options/",
+    "urlToImage": "https://9to5mac.com/wp-content/uploads/sites/6/2026/11/X.webp?w=1600",
+    "publishedAt": "2026-11-02T18:34:37Z",
+    "content": "X for iPhone and iPad just added over a dozen new app icon options"
   },
   {
-    "source": {"id": "india-today", "name": "India Today"},
-    "author": "Science Desk",
-    "title": "Viral Twitter thread from Hyderabad doctors explains seasonal dengue surge and prevention tips",
-    "description": "Medical professionals at a major Hyderabad hospital shared crucial advisory tweets reaching over 5 million impressions across Telangana.",
-    "url": "https://www.indiatoday.in/trending-news/story/hyderabad-doctors-viral-twitter-thread-dengue-prevention-2026",
-    "urlToImage": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T10:00:00Z",
-    "content": "Public health agencies in Hyderabad and neighboring districts commended the viral educational initiative."
+    "source": {
+      "name": "Firstpost"
+    },
+    "author": "via Firstpost",
+    "title": "Musk's SpaceX in talks to buy Boost Mobile or access its network, report says",
+    "description": "Elon Musk's satellite company is exploring a deal with EchoStar as it looks to combine Starlink's satellite network with conventional cellular infrastructure and challenge AT&T, Verizon and T-Mobile",
+    "url": "https://www.firstpost.com/business/spacex-boost-mobile-echostar-wireless-network-starlink-mobile-14057196.html",
+    "urlToImage": "https://images.firstpost.com/uploads/2026/09/SpaceX-Elon-musk-2026-09-4d217025a3339f3d0d72b58c1afc249c-1200x675.jpg",
+    "publishedAt": "2026-11-02T13:30:47Z",
+    "content": "Musk's SpaceX in talks to buy Boost Mobile or access its network, report says"
   },
   {
-    "source": {"id": "indian-express", "name": "The Indian Express"},
-    "author": "Tech Desk",
-    "title": "Indian tech community debates open-source AI models in massive viral thread on X",
-    "description": "Developers from Pune and Bengaluru spark an engaging dialogue on indigenous LLMs, data sovereignty, and compute infrastructure.",
-    "url": "https://indianexpress.com/article/technology/tech-news-technology/indian-developers-open-source-ai-debate-x-2026/",
-    "urlToImage": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T08:45:00Z",
-    "content": "Key startup founders joined the conversation to outline roadmap priorities for Indian AI innovation."
+    "source": {
+      "name": "ABP Live"
+    },
+    "author": "via ABP Live",
+    "title": "Rs 8,000 Diwali Bonus Scam: PIB Issues Warning, Here's How To Report It If You've Lost Money",
+    "description": "<p data-pm-slice=\"1 1 []\">A WhatsApp message promising an Rs 8,000 Diwali bonus from the Prime Minister is doing the rounds, but there is no such government benefit. The Press Information Bureau (PIB) has flagged the viral claim as fake, warning citizens that fraudsters are using the festive season to lure people into a phishing scam. The messages encourage recipients to click on links to claim th",
+    "url": "https://news.abplive.com/technology/diwali-bonus-scam-pib-warning-how-to-report-cyber-fraud-1874382",
+    "urlToImage": "https://feeds.abplive.com/onecms/images/uploaded-images/2026/11/02/8127a34f47ddf48e80de6e8c4002880f1793608922769402_original.jpg",
+    "publishedAt": "2026-11-02T08:56:34Z",
+    "content": "Rs 8,000 Diwali Bonus Scam: PIB Issues Warning, Here's How To Report It If You've Lost Money"
   },
   {
-    "source": {"id": "ndtv", "name": "NDTV"},
-    "author": "Sports Desk",
-    "title": "Cricket fans react as meme trend erupts on X following Ahmedabad stadium nail-biter",
-    "description": "Humorous viral posts and celebration clips dominated the microblogging platform after the final-over victory in Gujarat.",
-    "url": "https://www.ndtv.com/sports/cricket-x-viral-meme-trend-ahmedabad-match-2026",
-    "urlToImage": "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T07:15:00Z",
-    "content": "Trending hashtags held top slots across India for twelve consecutive hours."
+    "source": {
+      "name": "Social Media Today"
+    },
+    "author": "via Social Media Today",
+    "title": "X launches new bonus program for video creators",
+    "description": "The reward-based effort offers cash incentives to participants for posting videos on the platform.",
+    "url": "https://www.socialmediatoday.com/news/x-launches-new-bonus-program-for-video-creators/873404/",
+    "urlToImage": null,
+    "publishedAt": "2026-11-01T22:37:37Z",
+    "content": "X launches new bonus program for video creators"
+  },
+  {
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via TechCrunch",
+    "title": "X rolls out updated creator monetization metrics amid user community debate",
+    "description": "The platform formerly known as Twitter has introduced new dashboard features for verified creators in India and globally, sparking widespread community discussions about revenue transparency.",
+    "url": "https://techcrunch.com/2026/03/01/x-rolls-out-updated-creator-monetization-metrics/",
+    "publishedAt": "2026-03-01T14:30:00Z",
+    "content": "X rolls out updated creator monetization metrics amid user community debate",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via The Indian Express",
+    "title": "Viral meme trend on Twitter highlights regional language content adoption in India",
+    "description": "A humorous crossover trend involving local pop culture references and regional dialects went viral this week, driving record daily active user engagement across Indian metropolitan circles.",
+    "url": "https://indianexpress.com/article/technology/viral-meme-trend-twitter-india-regional-languages-9500000/",
+    "publishedAt": "2026-02-28T09:15:00Z",
+    "content": "Viral meme trend on Twitter highlights regional language content adoption in India",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "NDTV"
+    },
+    "author": "via NDTV",
+    "title": "Twitter community notes successfully curb viral misinformation during recent civic elections",
+    "description": "Journalists and researchers praised the platform's crowdsourced fact-checking feature for swiftly adding context to misleading electoral videos circulating heavily online.",
+    "url": "https://www.ndtv.com/india-news/twitter-community-notes-curb-viral-misinformation-elections-5400000",
+    "publishedAt": "2026-02-27T16:45:00Z",
+    "content": "Twitter community notes successfully curb viral misinformation during recent civic elections",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Mint"
+    },
+    "author": "via Mint",
+    "title": "Indian tech influencers debate new algorithmic changes on X regarding reach and visibility",
+    "description": "Prominent creators on the platform voiced concerns and strategies regarding fluctuating impression metrics following recent backend adjustments rolled out by product leads.",
+    "url": "https://www.livemint.com/technology/tech-influencers-debate-new-algorithmic-changes-on-x-reach-visibility-11710000.html",
+    "publishedAt": "2026-02-26T11:20:00Z",
+    "content": "Indian tech influencers debate new algorithmic changes on X regarding reach and visibility",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Times of India"
+    },
+    "author": "via Times of India",
+    "title": "Trending hashtag #DigitalIndia sparks national dialogue on social media accessibility",
+    "description": "A coordinated campaign by digital literacy advocates trended globally, prompting discussions about bridging the rural-urban digital divide and affordable internet access.",
+    "url": "https://timesofindia.indiatimes.com/technology/trending-hashtag-digitalindia-sparks-national-dialogue/articleshow/108000000.cms",
+    "publishedAt": "2026-02-25T08:00:00Z",
+    "content": "Trending hashtag #DigitalIndia sparks national dialogue on social media accessibility",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "BBC"
+    },
+    "author": "via BBC",
+    "title": "Global creator boycott discussions on X highlight growing tensions over platform policies",
+    "description": "Several high-profile international content creators have initiated public threads discussing alternative publishing platforms, driving widespread industry debate.",
+    "url": "https://www.bbc.com/news/technology-68500000",
+    "publishedAt": "2026-02-24T13:10:00Z",
+    "content": "Global creator boycott discussions on X highlight growing tensions over platform policies",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "India Today"
+    },
+    "author": "via India Today",
+    "title": "Viral cricket banter on Twitter unites fans ahead of upcoming international test series",
+    "description": "Humorous exchanges between cricket enthusiasts and sports journalists created a viral thread that trended number one nationwide for over twenty-four hours.",
+    "url": "https://www.indiatoday.in/sports/story/viral-cricket-banter-twitter-fans-international-series-2500000-2026-02-23",
+    "publishedAt": "2026-02-23T15:00:00Z",
+    "content": "Viral cricket banter on Twitter unites fans ahead of upcoming international test series",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via TechCrunch",
+    "title": "X launches improved live audio spaces interface, drawing positive creator feedback",
+    "description": "The redesigned audio broadcast feature has been met with enthusiasm by podcast hosts and community leaders hosting live town halls on the application.",
+    "url": "https://techcrunch.com/2026/02/22/x-launches-improved-live-audio-spaces-interface/",
+    "publishedAt": "2026-02-22T10:30:00Z",
+    "content": "X launches improved live audio spaces interface, drawing positive creator feedback",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via The Indian Express",
+    "title": "How a viral street food video from Delhi took over Twitter timelines globally",
+    "description": "A short clip capturing a unique culinary preparation method amassed millions of views, resulting in food creators flocking to the location to share reviews.",
+    "url": "https://indianexpress.com/article/trending/viral-street-food-video-delhi-twitter-timelines-9400000/",
+    "publishedAt": "2026-02-21T12:00:00Z",
+    "content": "How a viral street food video from Delhi took over Twitter timelines globally",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "NDTV"
+    },
+    "author": "via NDTV",
+    "title": "Twitter community rallies behind rescue animals after heart-wrenching viral thread",
+    "description": "Animal welfare organizations in India reported a surge in volunteer inquiries and donations following a viral rescue story shared by a prominent Mumbai activist.",
+    "url": "https://www.ndtv.com/offbeat/twitter-community-rallies-behind-rescue-animals-viral-thread-5300000",
+    "publishedAt": "2026-02-20T17:20:00Z",
+    "content": "Twitter community rallies behind rescue animals after heart-wrenching viral thread",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Mint"
+    },
+    "author": "via Mint",
+    "title": "Financial analysts on X dissect quarterly earnings reports through viral infographics",
+    "description": "A new wave of independent financial creators has gained massive traction by breaking down complex corporate balance sheets into digestible thread formats.",
+    "url": "https://www.livemint.com/market/financial-analysts-on-x-dissect-quarterly-earnings-11700000.html",
+    "publishedAt": "2026-02-19T09:40:00Z",
+    "content": "Financial analysts on X dissect quarterly earnings reports through viral infographics",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Times of India"
+    },
+    "author": "via Times of India",
+    "title": "Cinematic universe fan theories flood Twitter following unexpected trailer drop",
+    "description": "Movie enthusiasts generated thousands of quote-tweets analyzing background Easter eggs from a newly released teaser trailer, dominating entertainment trends.",
+    "url": "https://timesofindia.indiatimes.com/entertainment/hindi/bollywood/news/cinematic-universe-fan-theories-flood-twitter/articleshow/107000000.cms",
+    "publishedAt": "2026-02-18T14:15:00Z",
+    "content": "Cinematic universe fan theories flood Twitter following unexpected trailer drop",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "BBC"
+    },
+    "author": "via BBC",
+    "title": "Researchers study viral deepfake trend and its containment on microblogging platforms",
+    "description": "Academic studies published this week analyze how community-driven fact-checking mechanisms on X handle sophisticated synthetic media.",
+    "url": "https://www.bbc.com/news/technology-68400000",
+    "publishedAt": "2026-02-17T11:00:00Z",
+    "content": "Researchers study viral deepfake trend and its containment on microblogging platforms",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "India Today"
+    },
+    "author": "via India Today",
+    "title": "Artisans and handloom weavers find digital renaissance through viral Twitter campaign",
+    "description": "A grassroots initiative highlighting traditional Indian textile craftsmanship gained momentum, connecting rural artisans directly with global buyers.",
+    "url": "https://www.indiatoday.in/lifestyle/story/artisans-handloom-weavers-twitter-campaign-2400000-2026-02-16",
+    "publishedAt": "2026-02-16T10:00:00Z",
+    "content": "Artisans and handloom weavers find digital renaissance through viral Twitter campaign",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via TechCrunch",
+    "title": "X expands subscription features to enhance community moderation tools",
+    "description": "Platform updates allow verified group administrators greater control over comment sections and spam filtration, addressing long-standing creator grievances.",
+    "url": "https://techcrunch.com/2026/02/15/x-expands-subscription-features-moderation-tools/",
+    "publishedAt": "2026-02-15T15:30:00Z",
+    "content": "X expands subscription features to enhance community moderation tools",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via The Indian Express",
+    "title": "Nostalgia wave hits Indian Twitter as archival photographs of 90s cities go viral",
+    "description": "Thousands of users participated in sharing historical snapshots of urban landscapes, sparking sentimental debates about urban development and architecture.",
+    "url": "https://indianexpress.com/article/trending/nostalgia-wave-hits-indian-twitter-archival-photographs-9300000/",
+    "publishedAt": "2026-02-14T08:45:00Z",
+    "content": "Nostalgia wave hits Indian Twitter as archival photographs of 90s cities go viral",
+    "urlToImage": null
   }
 ]

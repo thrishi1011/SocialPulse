@@ -14,17 +14,21 @@ from backend.utils.translator import is_non_english
 logger = logging.getLogger("socialpulse.ai_processor")
 
 PREFERRED_MODELS = [
+    "gemini-3.5-flash-lite",
     "gemini-3.5-flash",
     "gemini-3.8-flash",
     "gemini-flash-latest",
-    "gemini-3.6-flash",
-    "gemini-2.5-flash",
-    "gemini-2.5-pro",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash"
+    "gemini-flash-lite-latest"
 ]
 
 BATCH_SIZE = 8
+
+def get_gemini_api_key(source_category: str = "A") -> str:
+    """Return GEMINI_KEY_SCRAP for category B (scraped news), otherwise GEMINI_KEY."""
+    if source_category == "B" and settings.GEMINI_KEY_SCRAP:
+        return settings.GEMINI_KEY_SCRAP
+    return settings.GEMINI_KEY or settings.GEMINI_KEY_SCRAP
+
 
 def clean_json_response(raw_text: str) -> str:
     """Strip markdown code fence wrappers from raw LLM output if present."""
@@ -67,7 +71,8 @@ def analyze_trend_with_gemini(
     """
     Execute a structured single-item Gemini AI call (used as fallback for missing batch items).
     """
-    if settings.MOCK_AI_MODE or not settings.GEMINI_KEY:
+    active_key = get_gemini_api_key(source_category)
+    if settings.MOCK_AI_MODE or not active_key:
         summary_text, cat_name, loc_india, is_trend = get_mock_ai_summary(platform_name.lower().replace(" ", "_"), title, description)
         return {
             "summary": summary_text,
@@ -78,7 +83,7 @@ def analyze_trend_with_gemini(
         }
 
     try:
-        genai.configure(api_key=settings.GEMINI_KEY)
+        genai.configure(api_key=active_key)
     except Exception as e:
         logger.error(f"Failed to configure Gemini API: {e}")
         cat = classify_category_heuristic(f"{title} {description}", default_source=platform_name)
@@ -173,8 +178,11 @@ def analyze_batch_with_gemini(batch: list[TrendingItem]) -> dict[int, dict[str, 
     if not batch:
         return {}
 
+    has_cat_b = any(getattr(item, "source_category", "A") == "B" for item in batch)
+    active_key = get_gemini_api_key("B" if has_cat_b else "A")
+
     # In mock mode or missing API key, use mock AI generator
-    if settings.MOCK_AI_MODE or not settings.GEMINI_KEY:
+    if settings.MOCK_AI_MODE or not active_key:
         results: dict[int, dict[str, Any]] = {}
         for item in batch:
             plat = item.source.display_name if item.source else "Social Platform"
@@ -193,7 +201,7 @@ def analyze_batch_with_gemini(batch: list[TrendingItem]) -> dict[int, dict[str, 
         return results
 
     try:
-        genai.configure(api_key=settings.GEMINI_KEY)
+        genai.configure(api_key=active_key)
     except Exception as e:
         logger.error(f"Failed to configure Gemini API: {e}")
         return {

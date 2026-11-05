@@ -45,7 +45,7 @@ clustering_lock = asyncio.Lock()
 def _generate_with_gemini(prompt: str) -> str:
     """Generate content trying preferred Gemini models in order."""
     import google.generativeai as genai
-    models_to_try = ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.6-flash", "gemini-2.5-flash"]
+    models_to_try = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash", "gemini-flash-latest"]
     last_err = None
     for model_name in models_to_try:
         try:
@@ -236,12 +236,13 @@ async def group_items_with_gemini(items: list[TrendingItem]) -> list[dict[str, A
     Send compact items to Gemini in up to 2 batches (max 60 items per batch).
     Returns validated groups of [{title, item_ids}].
     """
-    if settings.MOCK_AI_MODE or not settings.GEMINI_KEY:
+    active_key = settings.GEMINI_KEY_SCRAP or settings.GEMINI_KEY
+    if settings.MOCK_AI_MODE or not active_key:
         return cluster_by_jaccard_heuristic(items)
 
     try:
         import google.generativeai as genai
-        genai.configure(api_key=settings.GEMINI_KEY)
+        genai.configure(api_key=active_key)
     except Exception as e:
         logger.warning(f"Could not configure Gemini for clustering: {e}. Using Jaccard fallback.")
         return cluster_by_jaccard_heuristic(items)
@@ -317,12 +318,13 @@ async def summarize_topics_with_gemini(topics: list[Topic], db: Session):
     Generate crisp, factual summaries for up to 5 new cross-platform topics in ONE Gemini call.
     Preserves journalistic hedging for unverified claims.
     """
-    if not topics or settings.MOCK_AI_MODE or not settings.GEMINI_KEY:
+    active_key = settings.GEMINI_KEY_SCRAP or settings.GEMINI_KEY
+    if not topics or settings.MOCK_AI_MODE or not active_key:
         return
 
     try:
         import google.generativeai as genai
-        genai.configure(api_key=settings.GEMINI_KEY)
+        genai.configure(api_key=active_key)
     except Exception:
         return
 

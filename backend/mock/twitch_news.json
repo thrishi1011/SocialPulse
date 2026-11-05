@@ -1,32 +1,240 @@
 [
   {
-    "source": {"id": "indiatoday", "name": "India Today"},
-    "author": "Gaming Desk",
-    "title": "Indian esports streamer raises Rs 25 Lakh for flood relief during 24-hour Twitch marathon",
-    "description": "Popular gaming creator based in Mumbai rallied over 100,000 concurrent viewers to support disaster assistance efforts across western India.",
-    "url": "https://www.indiatoday.in/gaming/story/indian-streamer-twitch-charity-marathon-mumbai-flood-relief-2026",
-    "urlToImage": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T11:00:00Z",
-    "content": "The broadcast featured special guest appearances by prominent regional creators."
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via News Outlet",
+    "title": "Twitch Introduces New Discoverability Feeds to Combat Declining Creator Growth",
+    "description": "Twitch has rolled out a vertical video discovery feed to help smaller streamers gain traction, drawing comparisons to TikTok's recommendation algorithm.",
+    "url": "https://techcrunch.com/2026/05/10/twitch-discoverability-feeds-creator-growth/",
+    "publishedAt": "2026-05-10T14:30:00Z",
+    "content": "Twitch Introduces New Discoverability Feeds to Combat Declining Creator Growth",
+    "urlToImage": null
   },
   {
-    "source": {"id": "news18", "name": "News18"},
-    "author": "Tech & Gaming",
-    "title": "Twitch creator tournament in Hyderabad shatters South Asian livestream viewership records",
-    "description": "A marquee Valorant and fighting game showdown organized at HITEC City in Hyderabad, Telangana drew unprecedented live digital engagement.",
-    "url": "https://www.news18.com/buzz/twitch-hyderabad-esports-tournament-viewership-record-2026.html",
-    "urlToImage": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T08:30:00Z",
-    "content": "Organizers highlighted the rapid expansion of competitive gaming communities in India."
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via News Outlet",
+    "title": "Indian Gaming Community Reacts as Twitch Expands Localized Monetization Features",
+    "description": "Streamers in India welcome Twitch's new regional pricing structures and payout updates aimed at boosting local creator earnings.",
+    "url": "https://indianexpress.com/article/technology/gaming/twitch-localized-monetization-india-9123456/",
+    "publishedAt": "2026-05-09T11:15:00Z",
+    "content": "Indian Gaming Community Reacts as Twitch Expands Localized Monetization Features",
+    "urlToImage": null
   },
   {
-    "source": {"id": "mint", "name": "Mint"},
-    "author": "Digital Economy Reporter",
-    "title": "Twitch announces localized Indian server infrastructure and regional creator support hubs",
-    "description": "Amazon-owned streaming platform activates edge nodes in Mumbai and Chennai to reduce broadcast latency for Indian content creators.",
-    "url": "https://www.livemint.com/technology/twitch-india-server-infrastructure-edge-nodes-2026",
-    "urlToImage": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T06:15:00Z",
-    "content": "The initiative aims to improve livestream performance across pan-Indian broadband networks."
+    "source": {
+      "name": "Times of India"
+    },
+    "author": "via News Outlet",
+    "title": "Rising Popularity of Just Chatting Streams Highlights Shift in Indian Twitch Ecosystem",
+    "description": "Non-gaming content such as IRL walking tours and interactive podcasts are driving unprecedented viewership spikes across South Asia.",
+    "url": "https://timesofindia.indiatimes.com/technology/tech-news/rising-popularity-of-just-chatting-streams-on-twitch/articleshow/99887766.cms",
+    "publishedAt": "2026-05-08T16:20:00Z",
+    "content": "Rising Popularity of Just Chatting Streams Highlights Shift in Indian Twitch Ecosystem",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "BBC"
+    },
+    "author": "via News Outlet",
+    "title": "Twitch Streamer Breaks Marathon Broadcasting Record Amid Massive Community Support",
+    "description": "A prominent content creator completed a historic 300-hour continuous broadcast on Twitch, raising substantial funds for global charities.",
+    "url": "https://www.bbc.com/news/technology-68912345",
+    "publishedAt": "2026-05-08T09:45:00Z",
+    "content": "Twitch Streamer Breaks Marathon Broadcasting Record Amid Massive Community Support",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Mint"
+    },
+    "author": "via News Outlet",
+    "title": "Amazon's Twitch Faces Regulatory Scrutiny Over Content Moderation in International Markets",
+    "description": "Policymakers in multiple regions are calling for stricter enforcement of live-streaming guidelines following a series of high-profile viral incidents.",
+    "url": "https://www.livemint.com/technology/tech-news/amazons-twitch-faces-regulatory-scrutiny-over-content-moderation-11715000000000.html",
+    "publishedAt": "2026-05-07T12:00:00Z",
+    "content": "Amazon's Twitch Faces Regulatory Scrutiny Over Content Moderation in International Markets",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "India Today"
+    },
+    "author": "via News Outlet",
+    "title": "How Indian Esports Athletes Are Using Twitch to Build Global Personal Brands",
+    "description": "Professional Valorant and BGMI players in India are leveraging personal Twitch streams to connect directly with international fanbases.",
+    "url": "https://www.indiatoday.in/technology/news/story/how-indian-esports-athletes-are-using-twitch-to-build-global-brands-2534567-2026-05-07",
+    "publishedAt": "2026-05-07T08:10:00Z",
+    "content": "How Indian Esports Athletes Are Using Twitch to Build Global Personal Brands",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "NDTV"
+    },
+    "author": "via News Outlet",
+    "title": "Twitch Updates Safety Guidelines to Better Protect Creators From Automated Harassment",
+    "description": "In response to community feedback, Twitch has deployed advanced filtering tools to mitigate coordinated hate raids and toxic chat behavior.",
+    "url": "https://www.ndtv.com/world-news/twitch-updates-safety-guidelines-to-protect-creators-from-harassment-5567890",
+    "publishedAt": "2026-05-06T15:40:00Z",
+    "content": "Twitch Updates Safety Guidelines to Better Protect Creators From Automated Harassment",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via News Outlet",
+    "title": "Twitch Integrates Enhanced Multistreaming Capabilities for Partnered Creators",
+    "description": "Streamers can now broadcast simultaneously to Twitch and competing platforms without restrictive exclusivity clauses, shaking up the live streaming industry.",
+    "url": "https://techcrunch.com/2026/05/06/twitch-integrates-enhanced-multistreaming-capabilities/",
+    "publishedAt": "2026-05-06T10:00:00Z",
+    "content": "Twitch Integrates Enhanced Multistreaming Capabilities for Partnered Creators",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "BBC"
+    },
+    "author": "via News Outlet",
+    "title": "The Rise of Virtual VTubers on Twitch Marks a New Era of Digital Entertainment",
+    "description": "Avatar-based broadcasting continues to dominate viewership charts on Twitch, attracting millions of dedicated fans worldwide.",
+    "url": "https://www.bbc.com/news/entertainment-arts-68900000",
+    "publishedAt": "2026-05-05T14:10:00Z",
+    "content": "The Rise of Virtual VTubers on Twitch Marks a New Era of Digital Entertainment",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via News Outlet",
+    "title": "Why Indian Musicians and DJs Are Flocking to Twitch for Live Interactive Sets",
+    "description": "Independent artists in India are utilizing Twitch's direct-support features to host virtual concerts and monetize their performances.",
+    "url": "https://indianexpress.com/article/entertainment/music/indian-musicians-djs-twitch-live-interactive-sets-9120000/",
+    "publishedAt": "2026-05-05T11:25:00Z",
+    "content": "Why Indian Musicians and DJs Are Flocking to Twitch for Live Interactive Sets",
+    "urlToImage": null
+  },
+  {
+    "source": "Times of India",
+    "author": "via News Outlet",
+    "title": "Twitch Community Organizes Massive Relief Fundraiser Following Natural Disaster",
+    "description": "Top creators and viewers on Twitch united to raise millions of dollars for emergency disaster relief efforts across South Asia.",
+    "url": "https://timesofindia.indiatimes.com/technology/tech-news/twitch-community-organizes-massive-relief-fundraiser/articleshow/99800000.cms",
+    "publishedAt": "2026-05-04T17:50:00Z",
+    "content": "Twitch Community Organizes Massive Relief Fundraiser Following Natural Disaster",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Mint"
+    },
+    "author": "via News Outlet",
+    "title": "Twitch's Advertising Revenue Model Faces Pushback From Major Content Creators",
+    "description": "Prominent streamers have voiced concerns regarding new mandatory pre-roll ad placements and their impact on audience retention.",
+    "url": "https://www.livemint.com/industry/infotech/twitch-advertising-revenue-model-pushback-creators-11714000000000.html",
+    "publishedAt": "2026-05-04T13:05:00Z",
+    "content": "Twitch's Advertising Revenue Model Faces Pushback From Major Content Creators",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "India Today"
+    },
+    "author": "via News Outlet",
+    "title": "Top Indian Streamers Discuss the Challenges of Maintaining Mental Health While Streaming Daily",
+    "description": "A viral panel discussion on Twitch featured leading Indian creators opening up about burnout, toxic chat culture, and work-life balance.",
+    "url": "https://www.indiatoday.in/technology/news/story/top-indian-streamers-discuss-mental-health-burnout-twitch-2530000-2026-05-03",
+    "publishedAt": "2026-05-03T10:20:00Z",
+    "content": "Top Indian Streamers Discuss the Challenges of Maintaining Mental Health While Streaming Daily",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "NDTV"
+    },
+    "author": "via News Outlet",
+    "title": "Twitch Announces Expansion of Community Collaboration Tools for Co-Streaming",
+    "description": "New features allow multiple streamers to merge their chat feeds and audiences seamlessly, facilitating viral collaborative broadcasts.",
+    "url": "https://www.ndtv.com/world-news/twitch-announces-expansion-of-community-collaboration-tools-5550000",
+    "publishedAt": "2026-05-03T08:00:00Z",
+    "content": "Twitch Announces Expansion of Community Collaboration Tools for Co-Streaming",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via News Outlet",
+    "title": "Twitch Mobile App Redesign Focuses on Streamlined Navigation and Quick Clips",
+    "description": "The platform has overhauled its mobile application layout to prioritize short-form clips and personalized creator recommendations.",
+    "url": "https://techcrunch.com/2026/05/02/twitch-mobile-app-redesign-clips-navigation/",
+    "publishedAt": "2026-05-02T16:45:00Z",
+    "content": "Twitch Mobile App Redesign Focuses on Streamlined Navigation and Quick Clips",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "BBC"
+    },
+    "author": "via News Outlet",
+    "title": "How Twitch Streamers Are Redefining Modern Journalism Through Live On-The-Ground Reporting",
+    "description": "Independent creators covering major global events live on Twitch are frequently outperforming traditional news outlets in audience engagement.",
+    "url": "https://www.bbc.com/news/technology-68850000",
+    "publishedAt": "2026-05-02T12:15:00Z",
+    "content": "How Twitch Streamers Are Redefining Modern Journalism Through Live On-The-Ground Reporting",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via News Outlet",
+    "title": "Indian Chess Streamers Drive Record Engagement on Twitch Following International Tournament",
+    "description": "Grandmasters and chess content creators in India have sparked a massive surge in viewership across the platform's strategy gaming category.",
+    "url": "https://indianexpress.com/article/technology/gaming/indian-chess-streamers-twitch-record-engagement-9110000/",
+    "publishedAt": "2026-05-01T15:30:00Z",
+    "content": "Indian Chess Streamers Drive Record Engagement on Twitch Following International Tournament",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Times of India"
+    },
+    "author": "via News Outlet",
+    "title": "Twitch Partners With Major Esports Leagues to Broadcast Exclusive Tournaments in India",
+    "description": "The streaming giant aims to capture a larger share of the South Asian esports market through high-profile broadcasting partnerships.",
+    "url": "https://timesofindia.indiatimes.com/technology/tech-news/twitch-partners-with-major-esports-leagues-in-india/articleshow/99750000.cms",
+    "publishedAt": "2026-05-01T11:00:00Z",
+    "content": "Twitch Partners With Major Esports Leagues to Broadcast Exclusive Tournaments in India",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Mint"
+    },
+    "author": "via News Outlet",
+    "title": "Global Streaming Platforms Including Twitch Face Stiff Competition in Developing Markets",
+    "description": "Localizing content and adapting to regional internet infrastructure remain key hurdles for Twitch as it expands operations in Asia.",
+    "url": "https://www.livemint.com/industry/infotech/twitch-stiff-competition-developing-markets-asia-11713000000000.html",
+    "publishedAt": "2026-05-01T09:30:00Z",
+    "content": "Global Streaming Platforms Including Twitch Face Stiff Competition in Developing Markets",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "India Today"
+    },
+    "author": "via News Outlet",
+    "title": "Viral Twitch Clip of Indian Streamer's Reaction to Game Glitch Captivates Social Media",
+    "description": "A humorous moment from an indie game livestream went viral across Twitter, Instagram, and Reddit, bringing thousands of new followers to the creator.",
+    "url": "https://www.indiatoday.in/technology/news/story/viral-twitch-clip-indian-streamer-game-glitch-social-media-2525000-2026-05-01",
+    "publishedAt": "2026-05-01T07:15:00Z",
+    "content": "Viral Twitch Clip of Indian Streamer's Reaction to Game Glitch Captivates Social Media",
+    "urlToImage": null
   }
 ]

@@ -1,32 +1,242 @@
 [
   {
-    "source": {"id": "the-hindu", "name": "The Hindu"},
-    "author": "Tech Culture Desk",
-    "title": "Viral Reddit AMA by Indian wildlife biologists documents tiger corridor conservation",
-    "description": "Conservationists working in the Nilgiri Biosphere across Tamil Nadu and Kerala engaged thousands of Reddit users on habitat preservation techniques.",
-    "url": "https://www.thehindu.com/sci-tech/energy-and-environment/reddit-ama-indian-wildlife-biologists-nilgiris-2026/article.ece",
-    "urlToImage": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T11:15:00Z",
-    "content": "The Q&A generated high upvotes on popular community forums."
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via News Outlet",
+    "title": "Reddit faces user backlash over updated algorithmic feed changes and visibility drops",
+    "description": "Subreddit communities across the platform are voicing frustration following a silent rollout of feed sorting adjustments that favor algorithmic recommendations over chronological posts.",
+    "url": "https://techcrunch.com/2026/03/reddit-algorithm-feed-backlash-user-discontent",
+    "publishedAt": "2026-03-28T14:30:00Z",
+    "content": "Reddit faces user backlash over updated algorithmic feed changes and visibility drops",
+    "urlToImage": null
   },
   {
-    "source": {"id": "indian-express", "name": "The Indian Express"},
-    "author": "Trends Reporter",
-    "title": "Subreddit debate on Bangalore rents and startup workplace flexibility sparks viral discussions",
-    "description": "A detailed budgeting breakdown posted by a young professional in Bengaluru, Karnataka triggered widespread reflections on urban work-life balance.",
-    "url": "https://indianexpress.com/article/trending/bangalore-rent-workplace-debate-reddit-viral-2026/",
-    "urlToImage": "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T09:30:00Z",
-    "content": "Users shared comparative living cost insights across multiple Indian cities."
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via News Outlet",
+    "title": "How Indian subreddits became the ground zero for viral AI-generated hyper-realistic art debates",
+    "description": "Communities like r/India and r/DesiMeta are actively discussing the ethical implications of deepfakes and generative AI art dominating regional feeds.",
+    "url": "https://indianexpress.com/article/technology/reddit-india-ai-generated-art-viral-debate-9548201/",
+    "publishedAt": "2026-03-27T11:15:00Z",
+    "content": "How Indian subreddits became the ground zero for viral AI-generated hyper-realistic art debates",
+    "urlToImage": null
   },
   {
-    "source": {"id": "news18", "name": "News18"},
-    "author": "Buzz Desk",
-    "title": "Indian developers on r/developersIndia share breakthrough tips for AI productivity",
-    "description": "A collaborative mega-thread detailing local developer workflows, open source libraries, and career transitions reaches top trending rank.",
-    "url": "https://www.news18.com/buzz/developers-india-reddit-thread-ai-productivity-2026.html",
-    "urlToImage": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T07:45:00Z",
-    "content": "The thread served as an extensive resource compilation for young engineers."
+    "source": {
+      "name": "The Verge"
+    },
+    "author": "via News Outlet",
+    "title": "Reddit moderation strike threatens major communities as API pricing disputes resurface",
+    "description": "Independent volunteer moderators are threatening a coordinated slow-down or blackout, citing inadequate tooling and renewed friction with corporate policy teams.",
+    "url": "https://www.theverge.com/2026/3/26/reddit-moderation-strike-api-policy-dispute",
+    "publishedAt": "2026-03-26T09:45:00Z",
+    "content": "Reddit moderation strike threatens major communities as API pricing disputes resurface",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Mint"
+    },
+    "author": "via News Outlet",
+    "title": "Indian retail investors on Reddit's r/DalalStreetTalks drive massive discussion on SME IPO frenzy",
+    "description": "Retail traders on popular Indian finance subreddits are warning peers about speculative buying in small-and-medium enterprise IPOs, sparking a viral cautionary movement.",
+    "url": "https://www.livemint.com/market/stock-market-news/reddit-r-dalalstreettalks-retail-investors-sme-ipo-frenzy-warning-11743001234.html",
+    "publishedAt": "2026-03-25T16:20:00Z",
+    "content": "Indian retail investors on Reddit's r/DalalStreetTalks drive massive discussion on SME IPO frenzy",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "BBC"
+    },
+    "author": "via News Outlet",
+    "title": "Global Reddit community rallies to archive endangered digital folklore and niche internet history",
+    "description": "A massive archiving effort led by historical preservation subreddits has gained traction, seeking to save fading internet culture from link rot and forum closures.",
+    "url": "https://www.bbc.com/news/technology-reddit-digital-folklore-archiving-trend",
+    "publishedAt": "2026-03-24T13:10:00Z",
+    "content": "Global Reddit community rallies to archive endangered digital folklore and niche internet history",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "India Today"
+    },
+    "author": "via News Outlet",
+    "title": "Viral Reddit thread on Bengaluru traffic woes prompts direct response from civic authorities",
+    "description": "A detailed commuter data breakdown posted on r/Bengaluru went viral across Indian social media, forcing local municipal bodies to address bottlenecks.",
+    "url": "https://www.indiatoday.in/technology/news/story/viral-reddit-thread-bengaluru-traffic-civic-authorities-response-2521100-2026-03-23",
+    "publishedAt": "2026-03-23T08:50:00Z",
+    "content": "Viral Reddit thread on Bengaluru traffic woes prompts direct response from civic authorities",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Times of India"
+    },
+    "author": "via News Outlet",
+    "title": "Job seekers on Indian career subreddits expose predatory hiring practices and ghosting trends",
+    "description": "Threads detailing toxic interview loops and unprofessional recruiter behavior by Indian startups have gone viral, sparking broader corporate governance discussions.",
+    "url": "https://timesofindia.indiatimes.com/technology/tech-news/job-seekers-on-indian-career-subreddits-expose-predatory-hiring-practices/articleshow/108923456.cms",
+    "publishedAt": "2026-03-22T15:00:00Z",
+    "content": "Job seekers on Indian career subreddits expose predatory hiring practices and ghosting trends",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "NDTV"
+    },
+    "author": "via News Outlet",
+    "title": "Reddit's r/AskIndia thread on childhood memories of the 90s sets off a wave of nostalgia",
+    "description": "Thousands of users contributed nostalgic anecdotes, vintage advertisements, and television references, making it one of the most engaged community posts of the month.",
+    "url": "https://www.ndtv.com/offbeat/reddit-askindia-thread-90s-childhood-memories-nostalgia-viral-5431200",
+    "publishedAt": "2026-03-21T12:30:00Z",
+    "content": "Reddit's r/AskIndia thread on childhood memories of the 90s sets off a wave of nostalgia",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Wired"
+    },
+    "author": "via News Outlet",
+    "title": "How Reddit search data is quietly replacing traditional SEO for millions of Gen Z users",
+    "description": "Recent discourse on tech subreddits highlights how adding 'reddit' to Google searches has become the default mechanism for consumers seeking authentic product reviews.",
+    "url": "https://www.wired.com/story/reddit-search-data-replacing-traditional-seo-gen-z/",
+    "publishedAt": "2026-03-20T17:40:00Z",
+    "content": "How Reddit search data is quietly replacing traditional SEO for millions of Gen Z users",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Mashable"
+    },
+    "author": "via News Outlet",
+    "title": "Reddit community discovers hilarious translation glitch in global streaming subtitles",
+    "description": "A viral post capturing an absurd automated translation error on a popular television show spawned hundreds of localized meme formats across subreddits.",
+    "url": "https://mashable.com/article/reddit-community-translation-glitch-streaming-subtitles-viral",
+    "publishedAt": "2026-03-19T10:20:00Z",
+    "content": "Reddit community discovers hilarious translation glitch in global streaming subtitles",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "The Hindu"
+    },
+    "author": "via News Outlet",
+    "title": "Linguistic diversity celebrated on Indian regional subreddits through crowdsourced translation projects",
+    "description": "Users across r/Tamil, r/Malayalam, and r/Telugu have teamed up to digitize rare regional folk stories, gaining mainstream media attention.",
+    "url": "https://www.thehindu.com/sci-tech/technology/linguistic-diversity-indian-regional-subreddits-crowdsourced-translation/article67987654.ece",
+    "publishedAt": "2026-03-18T14:00:00Z",
+    "content": "Linguistic diversity celebrated on Indian regional subreddits through crowdsourced translation projects",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Engadget"
+    },
+    "author": "via News Outlet",
+    "title": "Reddit rolls out enhanced creator monetization tools to incentivize high-quality AMAs and discussions",
+    "description": "The platform's latest update introduces direct funding models for top contributors and expert AMA hosts, shifting creator dynamics on the text-first network.",
+    "url": "https://www.engadget.com/reddit-rolls-out-enhanced-creator-monetization-tools-amas-110000333.html",
+    "publishedAt": "2026-03-17T11:00:00Z",
+    "content": "Reddit rolls out enhanced creator monetization tools to incentivize high-quality AMAs and discussions",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Hindustan Times"
+    },
+    "author": "via News Outlet",
+    "title": "Viral Reddit debate questions the cultural shift in Indian corporate work-life balance expectations",
+    "description": "An open letter posted by a mid-level engineer detailing mandatory weekend calls at a multinational firm resonated deeply, accumulating thousands of upvotes and debate.",
+    "url": "https://www.hindustantimes.com/trending/viral-reddit-debate-indian-corporate-work-life-balance-expectations-101742200000.html",
+    "publishedAt": "2026-03-16T09:30:00Z",
+    "content": "Viral Reddit debate questions the cultural shift in Indian corporate work-life balance expectations",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Financial Express"
+    },
+    "author": "via News Outlet",
+    "title": "Fintech discussions on Reddit highlight rising consumer awareness around hidden credit card fees",
+    "description": "Financial subreddits in India have become hotbeds for consumer advocacy, with viral threads exposing unfair banking practices and subscription traps.",
+    "url": "https://www.financialexpress.com/money/fintech-discussions-on-reddit-highlight-rising-consumer-awareness-hidden-credit-card-fees-3450000/",
+    "publishedAt": "2026-03-15T15:45:00Z",
+    "content": "Fintech discussions on Reddit highlight rising consumer awareness around hidden credit card fees",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Business Standard"
+    },
+    "author": "via News Outlet",
+    "title": "Reddit's advertising revenue surges as brands shift focus toward hyper-targeted community marketing",
+    "description": "Financial analysts report increased brand spending on targeted subreddit campaigns following new advertising tool integrations.",
+    "url": "https://www.business-standard.com/companies/news/reddit-advertising-revenue-surges-targeted-community-marketing-126031400012_1.html",
+    "publishedAt": "2026-03-14T10:15:00Z",
+    "content": "Reddit's advertising revenue surges as brands shift focus toward hyper-targeted community marketing",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Economic Times"
+    },
+    "author": "via News Outlet",
+    "title": "Tech talent exodus discussions on Indian subreddits reflect changing migration patterns to Europe",
+    "description": "Threads comparing cost-of-living crises in Bengaluru versus European tech hubs have generated extensive discourse among Indian software engineers.",
+    "url": "https://economictimes.indiatimes.com/tech/technology/tech-talent-exodus-discussions-indian-subreddits-migration-europe/articleshow/108500000.cms",
+    "publishedAt": "2026-03-13T16:50:00Z",
+    "content": "Tech talent exodus discussions on Indian subreddits reflect changing migration patterns to Europe",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via News Outlet",
+    "title": "How Reddit is bridging the gap for independent food creators in Tier-2 Indian cities",
+    "description": "Subreddits dedicated to regional cuisine have helped obscure home chefs and street food vendors gain sudden national prominence through viral reviews.",
+    "url": "https://indianexpress.com/article/lifestyle/food-wine/reddit-tier-2-indian-cities-independent-food-creators-viral-reviews-9530000/",
+    "publishedAt": "2026-03-12T12:00:00Z",
+    "content": "How Reddit is bridging the gap for independent food creators in Tier-2 Indian cities",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via News Outlet",
+    "title": "Reddit updates content moderation guidelines to combat coordinated bot manipulation campaigns",
+    "description": "The company announced sophisticated new machine-learning detectors aimed at neutralizing automated political and commercial astroturfing on major boards.",
+    "url": "https://techcrunch.com/2026/03/11/reddit-updates-content-moderation-guidelines-bot-manipulation/",
+    "publishedAt": "2026-03-11T14:20:00Z",
+    "content": "Reddit updates content moderation guidelines to combat coordinated bot manipulation campaigns",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "BBC"
+    },
+    "author": "via News Outlet",
+    "title": "The rise of micro-communities: Why users are fleeing mainstream feeds for niche subreddits",
+    "description": "Sociological analysis of internet behavior reveals a mass migration toward smaller, heavily moderated private subreddits in search of authentic discourse.",
+    "url": "https://www.bbc.com/news/articles/micro-communities-reddit-niche-subreddits-authentic-discourse",
+    "publishedAt": "2026-03-10T09:00:00Z",
+    "content": "The rise of micro-communities: Why users are fleeing mainstream feeds for niche subreddits",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "India Today"
+    },
+    "author": "via News Outlet",
+    "title": "Viral Reddit AMA featuring prominent Indian space scientists draws record community engagement",
+    "description": "An interactive Q&A session with ISRO researchers on a science subreddit captivated thousands of young Indian STEM aspirants with insights into upcoming missions.",
+    "url": "https://www.indiatoday.in/science/story/viral-reddit-ama-isro-scientists-record-engagement-2510000-2026-03-09",
+    "publishedAt": "2026-03-09T17:10:00Z",
+    "content": "Viral Reddit AMA featuring prominent Indian space scientists draws record community engagement",
+    "urlToImage": null
   }
 ]

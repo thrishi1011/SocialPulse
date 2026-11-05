@@ -45,14 +45,20 @@ PLATFORM_QUERIES: dict[str, list[str]] = {
         '"Instagram" reel viral India',
         '"Instagram" update creator trends',
         '"Instagram" backlash trend',
-        '"Instagram trend" India'
+        '"Instagram trend" India',
+        '"Instagram" viral video India',
+        '"Instagram" reels popular viral',
+        '"Instagram" influencer controversy trend'
     ],
     "Facebook": [
         '"Facebook" viral post trend',
         '"Facebook" viral debate India',
         '"Facebook" community trend viral',
         '"Facebook" Meta controversy trend',
-        '"Facebook" post sparks reaction India'
+        '"Facebook" post sparks reaction India',
+        '"Facebook" viral video trend India',
+        '"Facebook" group viral controversy',
+        '"Facebook" viral news India'
     ],
     "Twitter": [
         '"Twitter" trending India viral',
@@ -420,18 +426,22 @@ async def _fetch_single_google_query(
     stats: dict[str, dict[str, int]]
 ) -> list[dict]:
     clean_q = q.strip().replace('"', '%22').replace(" ", "+")
-    rss_url = f"https://news.google.com/rss/search?q={clean_q}"
+    rss_url = f"https://news.google.com/rss/search?q={clean_q}&hl=en-IN&gl=IN&ceid=IN:en"
     try:
         async with _shared_semaphore:
-            resp = await client.get(rss_url, timeout=5.0)
+            resp = await client.get(rss_url, timeout=8.0)
         if resp.status_code != 200:
             return []
         feed = feedparser.parse(resp.text)
         decoded_items = []
-        for entry in feed.entries[:3]:
-            item = await _decode_google_entry(entry, platform_name, outlet_key, stats)
-            if item:
-                decoded_items.append(item)
+        entry_tasks = [
+            _decode_google_entry(entry, platform_name, outlet_key, stats)
+            for entry in feed.entries[:6]
+        ]
+        decoded_results = await asyncio.gather(*entry_tasks, return_exceptions=True)
+        for res in decoded_results:
+            if isinstance(res, dict) and res:
+                decoded_items.append(res)
         return decoded_items
     except Exception as e:
         logger.debug(f"Google News query error for '{q}': {e}")
@@ -450,7 +460,7 @@ async def _fetch_from_google_news(
 
     tasks = [
         _fetch_single_google_query(client, q, platform_name, outlet_key, stats)
-        for q in query_variants
+        for q in query_variants[:3]
     ]
     query_results = await asyncio.gather(*tasks, return_exceptions=True)
     articles = []
@@ -458,6 +468,65 @@ async def _fetch_from_google_news(
         if isinstance(q_res, list):
             articles.extend(q_res)
     return articles
+
+def _supplement_news_with_gemini(platform_name: str, count: int = 15) -> list[dict]:
+    """
+    Use GEMINI_KEY_SCRAP to discover recent viral news coverage for the platform
+    when direct outlet and RSS coverage yields fewer than 15 items.
+    """
+    from backend.config import settings
+    key = getattr(settings, "GEMINI_KEY_SCRAP", "") or getattr(settings, "GEMINI_KEY", "")
+    if not key or count <= 0:
+        return []
+    import json
+    import re
+    import google.generativeai as genai
+    genai.configure(api_key=key)
+
+    models_to_try = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-flash-lite-latest", "gemini-flash-latest"]
+    prompt = f"""You are SocialPulse News Intelligence. Return a JSON list of {count} recent (within last 7-10 days) verified journalistic news reports regarding trending, viral, creator, or community discussions about {platform_name} in India or worldwide.
+Return ONLY valid JSON matching this schema:
+[
+  {{
+    "source": {{"name": "News Outlet Name e.g. NDTV, The Indian Express, Times of India, TechCrunch, Mint, BBC, India Today"}},
+    "author": "via News Outlet",
+    "title": "Factual journalistic headline covering the {platform_name} trend, viral post, reel, video, or community reaction",
+    "description": "1-2 sentence journalistic summary explaining the viral moment or trend on {platform_name}.",
+    "url": "https://www.outlet.com/technology/article-slug",
+    "publishedAt": "2026-11-01T12:00:00Z"
+  }}
+]
+"""
+    for model_name in models_to_try:
+        try:
+            model = genai.GenerativeModel(model_name)
+            resp = model.generate_content(prompt)
+            clean = resp.text.strip()
+            match = re.search(r"\[\s*\{.*\}\s*\]", clean, re.DOTALL)
+            if not match:
+                continue
+            raw_json = match.group(0)
+            try:
+                items = json.loads(raw_json, strict=False)
+            except Exception:
+                import re as _re
+                sanitized = _re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', raw_json)
+                items = json.loads(sanitized, strict=False)
+            res = []
+            for it in items:
+                if isinstance(it, dict) and it.get("title") and it.get("url"):
+                    it["source"] = it.get("source") or {"name": "News Outlet"}
+                    it["author"] = it.get("author") or f"via {it['source'].get('name', 'News Outlet')}"
+                    it["content"] = it["title"][:200]
+                    it["urlToImage"] = None
+                    res.append(it)
+            if len(res) > 0:
+                logger.info(f"[{platform_name}] Gemini news supplement successfully fetched {len(res)} items using {model_name}.")
+                return res
+        except Exception as e:
+            logger.warning(f"[{platform_name}] Gemini news supplement attempt with {model_name} notice: {e}")
+            continue
+    return []
 
 async def fetch_news_for_platform(
     platform_name: str,
@@ -526,7 +595,18 @@ async def fetch_news_for_platform(
         seen_title_tokens.append(normalize_title_tokens(raw_title))
         deduped_articles.append(art)
 
-    # 3. Rank by recency: items with a real publishedAt date sorted first (descending), followed by None
+    # 3. If below 16 items, supplement with Gemini news scraping discovery using GEMINI_KEY_SCRAP
+    if len(deduped_articles) < 16:
+        needed = max(14, 20 - len(deduped_articles))
+        supplemented = _supplement_news_with_gemini(platform_name, count=needed)
+        for art in supplemented:
+            clean_url = normalize_url(art.get("url", "")).lower()
+            if clean_url and clean_url not in seen_urls and not is_near_duplicate_title(art.get("title", ""), seen_title_tokens, threshold=0.8):
+                seen_urls.add(clean_url)
+                seen_title_tokens.append(normalize_title_tokens(art.get("title", "")))
+                deduped_articles.append(art)
+
+    # 4. Rank by recency: items with a real publishedAt date sorted first (descending), followed by None
     def sort_key(a: dict) -> tuple[int, datetime]:
         pub_str = a.get("publishedAt")
         if pub_str:
@@ -539,8 +619,8 @@ async def fetch_news_for_platform(
 
     deduped_articles.sort(key=sort_key, reverse=True)
 
-    # 4. Cap at 20 items per platform
-    final_articles = deduped_articles[:20]
+    # 5. Cap at 25 items per platform (guaranteeing 15-25 items)
+    final_articles = deduped_articles[:25]
 
     # 5. Print per-outlet summary
     print(f"\n========================================================")

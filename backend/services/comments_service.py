@@ -221,24 +221,24 @@ def _fetch_live_youtube_comments_sync(item: TrendingItem, limit: int = 10) -> Op
     if not video_id:
         return None
 
-    import httpx
-    url = "https://www.googleapis.com/youtube/v3/commentThreads"
+    import urllib.request
+    import urllib.parse
+    import json
+
+    base_url = "https://www.googleapis.com/youtube/v3/commentThreads"
     params = {
         "part": "snippet",
         "videoId": video_id,
-        "maxResults": limit,
+        "maxResults": str(limit),
         "order": "relevance",
         "key": settings.YOUTUBE_API_KEY
     }
 
     try:
-        with httpx.Client(timeout=10.0) as client:
-            resp = client.get(url, params=params)
-            if resp.status_code != 200:
-                logger.warning(f"YouTube comments API returned {resp.status_code}: {resp.text}")
-                return None
-
-            data = resp.json()
+        query = urllib.parse.urlencode(params)
+        req = urllib.request.Request(f"{base_url}?{query}", headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=10.0) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
             items = data.get("items", [])
             if not items:
                 return None

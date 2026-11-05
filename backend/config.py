@@ -40,6 +40,7 @@ class Settings:
     NEWSAPI_KEY: str = os.getenv("NEWSAPI_KEY", "").strip()
     GNEWS_KEY: str = os.getenv("GNEWS_KEY", "").strip()
     GEMINI_KEY: str = os.getenv("GEMINI_KEY", "").strip()
+    GEMINI_KEY_SCRAP: str = (os.getenv("GEMINI_KEY_SCRAP") or os.getenv("GEMINI_KEY_SCRAP ") or "").strip()
 
     # Category A Official API Keys
     YOUTUBE_API_KEY: str = os.getenv("YOUTUBE_API_KEY", "").strip()

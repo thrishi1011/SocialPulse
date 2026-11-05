@@ -1,62 +1,242 @@
 [
   {
-    "source": {"id": "india-today", "name": "India Today"},
-    "author": "Trending Desk",
-    "title": "Viral Instagram Reel showing street food vendor in Mumbai sparks nationwide safety debate",
-    "description": "A food safety reel recorded at a popular chowpatty stall in Mumbai, Maharashtra surpassed 40 million views on Instagram, prompting state food safety inspections.",
-    "url": "https://www.indiatoday.in/trending-news/story/mumbai-street-food-reel-viral-instagram-2026",
-    "urlToImage": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T11:45:00Z",
-    "content": "Instagram creators across Mumbai are remixing the original viral reel with contrasting hygiene reviews."
+    "source": {
+      "name": "Social Media Today"
+    },
+    "author": "via Social Media Today",
+    "title": "Meta delays commercial terms update indefinitely",
+    "description": "The company's upcoming commercial terms of service update has prompted regulators to seek more insight into the specific details.",
+    "url": "https://www.socialmediatoday.com/news/meta-delays-commercial-terms-update-indefinitely/873528/",
+    "urlToImage": null,
+    "publishedAt": "2026-11-02T22:46:42Z",
+    "content": "Meta delays commercial terms update indefinitely"
   },
   {
-    "source": {"id": "indian-express", "name": "The Indian Express"},
-    "author": "Express Web Desk",
-    "title": "Bengaluru techie's viral Instagram Reel on suburban train commute goes viral",
-    "description": "Commuters in Bengaluru, Karnataka celebrate a creative Instagram video highlighting quick rail transfers that beat Outer Ring Road traffic gridlock.",
-    "url": "https://indianexpress.com/article/trending/trending-in-india/bengaluru-suburban-rail-instagram-reel-viral/",
-    "urlToImage": "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T10:10:00Z",
-    "content": "The clip has struck a chord with hundreds of thousands of daily office goers across the Karnataka capital."
+    "source": {
+      "name": "Social Media Today"
+    },
+    "author": "via Social Media Today",
+    "title": "Meta updates creator assistant chatbot",
+    "description": "The company’s artificial intelligence-powered tool now features opportunity alerts, better help for content creation and automated replies.",
+    "url": "https://www.socialmediatoday.com/news/meta-updates-creator-assistant-chatbot/873524/",
+    "urlToImage": null,
+    "publishedAt": "2026-11-02T22:25:51Z",
+    "content": "Meta updates creator assistant chatbot"
   },
   {
-    "source": {"id": "ndtv", "name": "NDTV"},
-    "author": "Offbeat Desk",
-    "title": "Kerala college dance troupe's Onam celebration Instagram Reel clocks 25 million views",
-    "description": "Students in Kochi, Kerala blend classical folk steps with contemporary beats in an electrifying campus performance praised by international creators.",
-    "url": "https://www.ndtv.com/trends/kerala-college-onam-dance-reel-viral-instagram-2026",
-    "urlToImage": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T09:20:00Z",
-    "content": "The performance has become one of the most shared festive reels from southern India this season."
+    "source": {
+      "name": "The Verge"
+    },
+    "author": "via The Verge",
+    "title": "Meta will end Quest 2 OS updates in 2027",
+    "description": "Meta is planning to release the last OS update for its Quest 2 and Quest Pro VR headsets by March 2027, the company announced today. The last OS update for those devices is planned to be v213, and after that, Meta will continue to ship security patches and critical bug fixes through the end of […]",
+    "url": "https://www.theverge.com/tech/1024835/meta-vr-quest-2-pro-os-end-updates",
+    "urlToImage": null,
+    "publishedAt": "2026-11-02T21:04:20Z",
+    "content": "Meta will end Quest 2 OS updates in 2027"
   },
   {
-    "source": {"id": "news18", "name": "News18"},
-    "author": "Buzz Desk",
-    "title": "Delhi Metro aesthetic timelapse Reel by architectural student trends across India",
-    "description": "Visual artist captures the futuristic glass canopy and architectural geometry of New Delhi transit stations in a viral Instagram reel.",
-    "url": "https://www.news18.com/buzz/delhi-metro-aesthetic-reel-viral-instagram-2026.html",
-    "urlToImage": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T08:15:00Z",
-    "content": "Viewers marvelled at the cinematic color grade that transformed daily commutes into art."
+    "source": {
+      "name": "Social Media Today"
+    },
+    "author": "via Social Media Today",
+    "title": "Instagram offers to pay creators for long-form content",
+    "description": "Creators were offered as much as $500,000 to post videos to Meta’s new Features product, according to Business Insider.",
+    "url": "https://www.socialmediatoday.com/news/instagram-offers-to-pay-creators-for-long-form-content/873402/",
+    "urlToImage": "https://imgproxy.divecdn.com/hIUIo3PXvdugDyfozSvrzAFzzL4CScua7W_PhwqRdlk/g:ce/rs:fill:1600:900:1/Z3M6Ly9kaXZlc2l0ZS1zdG9yYWdlL2RpdmVpbWFnZS9pbnN0YWdyYW1fZmVhdHVyZXMucG5n.webp",
+    "publishedAt": "2026-11-01T22:29:02Z",
+    "content": "Instagram offers to pay creators for long-form content"
   },
   {
-    "source": {"id": "the-hindu", "name": "The Hindu"},
-    "author": "Culture Reporter",
-    "title": "Chennai heritage filter and carnatic remix creates trending audio wave on Instagram",
-    "description": "Musicians from Chennai, Tamil Nadu fuse veena ragas with lo-fi beats, generating over 100,000 creator reels across South Asia.",
-    "url": "https://www.thehindu.com/entertainment/chennai-carnatic-lo-fi-instagram-audio-trend/article2026.ece",
-    "urlToImage": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T06:50:00Z",
-    "content": "The audio trend demonstrates the vibrant intersection of classical Indian art and digital youth culture."
+    "source": {
+      "name": "The Hindu"
+    },
+    "author": "via The Hindu",
+    "title": "‘Unavailable in India’: Why are social media posts being blocked amid protests? | Explained",
+    "description": "MeitY’s advisory to Meta, shorter takedown deadlines under amended IT Rules, and platforms’ own enforcement policies have brought renewed scrutiny of how online content is blocked, and what recourse users have",
+    "url": "https://www.thehindu.com/news/national/why-are-social-media-posts-being-blocked-in-india-amid-protests-explained/article71643710.ece",
+    "urlToImage": "https://th-i.thgim.com/public/incoming/luuuzt/article71643733.ece/alternates/LANDSCAPE_1200/2026-01-27T094908Z_1686426464_RC2QCIAJZZAQ_RTRMADP_3_INDIA-SOCIALMEDIA-CHILDREN.JPG",
+    "publishedAt": "2026-11-01T06:27:47Z",
+    "content": "‘Unavailable in India’: Why are social media posts being blocked amid protests? | Explained"
   },
   {
-    "source": {"id": "mint", "name": "Mint"},
-    "author": "Tech Desk",
-    "title": "Meta rolls out creator monetization upgrades on Instagram for Indian micro-influencers",
-    "description": "New in-stream revenue tools and performance bonuses announced for digital creators operating outside metro hubs across Tier-2 Indian cities.",
-    "url": "https://www.livemint.com/technology/meta-instagram-creator-tools-india-monetization-2026",
-    "urlToImage": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=60",
-    "publishedAt": "2026-10-10T05:30:00Z",
-    "content": "Digital strategists highlight the accelerated economic impact of regional content in India."
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via News Outlet",
+    "title": "Instagram Rolls Out New Features to Enhance Creator Monetization and Direct Messaging",
+    "description": "Instagram has introduced new subscription tiers and expanded direct messaging tools globally to help content creators better engage and monetize their audiences.",
+    "url": "https://techcrunch.com/2026/03/01/instagram-creator-monetization-updates/",
+    "publishedAt": "2026-03-01T10:00:00Z",
+    "content": "Instagram Rolls Out New Features to Enhance Creator Monetization and Direct Messaging",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via News Outlet",
+    "title": "Viral Reel Trend Sparks Safety Debate Among Parents and Educators in India",
+    "description": "A new trend involving unsupervised outdoor challenges on Instagram Reels has prompted serious concerns among child safety advocates and educators across major Indian cities.",
+    "url": "https://indianexpress.com/article/technology/viral-instagram-reel-safety-debate-india-9123456/",
+    "publishedAt": "2026-02-28T14:30:00Z",
+    "content": "Viral Reel Trend Sparks Safety Debate Among Parents and Educators in India",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "NDTV"
+    },
+    "author": "via News Outlet",
+    "title": "How Brands in India Are Leveraging Instagram's Broadcast Channels for Direct Engagement",
+    "description": "Indian retail and lifestyle brands are increasingly turning to Instagram Broadcast Channels to bypass algorithmic clutter and connect directly with Gen Z consumers.",
+    "url": "https://www.ndtv.com/business/instagram-broadcast-channels-brand-engagement-india-5123987",
+    "publishedAt": "2026-02-27T09:15:00Z",
+    "content": "How Brands in India Are Leveraging Instagram's Broadcast Channels for Direct Engagement",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Times of India"
+    },
+    "author": "via News Outlet",
+    "title": "Delhi Police Issue Advisory Following Viral Instagram Prank Videos Causing Public Nuisance",
+    "description": "Authorities in New Delhi have issued strict warnings against content creators staging disruptive public pranks solely for engagement and views on Instagram.",
+    "url": "https://timesofindia.indiatimes.com/city/delhi/delhi-police-advisory-instagram-prank-videos/articleshow/98765432.cms",
+    "publishedAt": "2026-02-26T16:45:00Z",
+    "content": "Delhi Police Issue Advisory Following Viral Instagram Prank Videos Causing Public Nuisance",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Mint"
+    },
+    "author": "via News Outlet",
+    "title": "Meta Expands AI-Generated Content Labelling on Instagram Amid Global Scrutiny",
+    "description": "Instagram has begun rolling out more prominent 'Made with AI' tags on photos and videos uploaded by users in India and globally to maintain transparency.",
+    "url": "https://www.livemint.com/technology/tech-news/meta-expands-ai-content-labelling-instagram-11709123456789.html",
+    "publishedAt": "2026-02-25T11:20:00Z",
+    "content": "Meta Expands AI-Generated Content Labelling on Instagram Amid Global Scrutiny",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "India Today"
+    },
+    "author": "via News Outlet",
+    "title": "Travel Creators in India Face Backlash Over Viral Reels Promoting Overcrowded Destinations",
+    "description": "Instagram travel influencers are facing heavy criticism from local communities and environmentalists for popularizing fragile ecosystems that are now suffering from overtourism.",
+    "url": "https://www.indiatoday.in/technology/news/story/instagram-travel-creators-backlash-overtourism-india-2456789-2026-02-24",
+    "publishedAt": "2026-02-24T08:00:00Z",
+    "content": "Travel Creators in India Face Backlash Over Viral Reels Promoting Overcrowded Destinations",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "BBC"
+    },
+    "author": "via News Outlet",
+    "title": "Instagram Tests Algorithm Shifts Favoring Original Content Over Reposted Aggregators",
+    "description": "In an effort to support authentic creators, Instagram's latest algorithmic updates are giving higher reach priority to original videos and punishing unoriginal reposts.",
+    "url": "https://www.bbc.com/news/technology-68412345",
+    "publishedAt": "2026-02-23T15:10:00Z",
+    "content": "Instagram Tests Algorithm Shifts Favoring Original Content Over Reposted Aggregators",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "TechCrunch"
+    },
+    "author": "via News Outlet",
+    "title": "Instagram's Notes Feature Becomes the Go-To Status Board for Gen Z Communities",
+    "description": "Data reveals that Instagram Notes has achieved staggering adoption among younger demographics, emerging as a primary micro-blogging tool for status updates.",
+    "url": "https://techcrunch.com/2026/02/22/instagram-notes-gen-z-adoption-trend/",
+    "publishedAt": "2026-02-22T12:00:00Z",
+    "content": "Instagram's Notes Feature Becomes the Go-To Status Board for Gen Z Communities",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "The Indian Express"
+    },
+    "author": "via News Outlet",
+    "title": "Mumbai Fashion Week Creators Drive Massive Engagement Through Instagram's Collaborative Posts",
+    "description": "Indian fashion designers and lifestyle creators utilized Instagram's collaborative posting features to cross-pollinate audiences and set viral trends during the latest fashion week.",
+    "url": "https://indianexpress.com/article/lifestyle/fashion/instagram-collaborative-posts-mumbai-fashion-week-9112233/",
+    "publishedAt": "2026-02-21T13:40:00Z",
+    "content": "Mumbai Fashion Week Creators Drive Massive Engagement Through Instagram's Collaborative Posts",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "NDTV"
+    },
+    "author": "via News Outlet",
+    "title": "From Reels to Runway: How Indie Musicians in India Are Finding Fame on Instagram",
+    "description": "Independent artists across India are crediting viral hook steps and background audio trends on Instagram Reels for launching their tracks into mainstream charts.",
+    "url": "https://www.ndtv.com/entertainment/indie-musicians-fame-instagram-reels-india-5111999",
+    "publishedAt": "2026-02-20T10:50:00Z",
+    "content": "From Reels to Runway: How Indie Musicians in India Are Finding Fame on Instagram",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Times of India"
+    },
+    "author": "via News Outlet",
+    "title": "Cyber Cells Alert Users Regarding Sophisticated Phishing Scams Masquerading as Instagram Verification",
+    "description": "Law enforcement cyber cells have issued warnings about fraudulent direct messages promising verified blue badges designed to steal user credentials on Instagram.",
+    "url": "https://timesofindia.indiatimes.com/technology/tech-news/instagram-blue-badge-phishing-scams-cyber-cell-warning/articleshow/98754321.cms",
+    "publishedAt": "2026-02-19T07:30:00Z",
+    "content": "Cyber Cells Alert Users Regarding Sophisticated Phishing Scams Masquerading as Instagram Verification",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Mint"
+    },
+    "author": "via News Outlet",
+    "title": "Instagram Tests New Community Moderation Tools for Creators to Manage Comment Sections",
+    "description": "To combat cyberbullying and toxic discourse, Instagram is rolling out advanced AI-driven bulk comment filtering and moderation tools for high-follower creators.",
+    "url": "https://www.livemint.com/technology/tech-news/instagram-community-moderation-tools-creators-11708876543210.html",
+    "publishedAt": "2026-02-18T16:00:00Z",
+    "content": "Instagram Tests New Community Moderation Tools for Creators to Manage Comment Sections",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "India Today"
+    },
+    "author": "via News Outlet",
+    "title": "Viral Food Fusion Trend on Instagram Divides Culinary Enthusiasts Across India",
+    "description": "An unconventional street food fusion video went viral on Instagram this week, sparking intense online debates and humorous reactions among food critics and creators.",
+    "url": "https://www.indiatoday.in/trending-news/story/viral-food-fusion-trend-instagram-india-reactions-2455123-2026-02-17",
+    "publishedAt": "2026-02-17T11:00:00Z",
+    "content": "Viral Food Fusion Trend on Instagram Divides Culinary Enthusiasts Across India",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "BBC"
+    },
+    "author": "via News Outlet",
+    "title": "Meta Faces Regulatory Inquiries Over Instagram's Algorithmic Feed Recommendations in Multiple Markets",
+    "description": "Global regulatory bodies are examining Instagram's recommendation systems and their potential impact on teen mental health and platform transparency.",
+    "url": "https://www.bbc.com/news/technology-68398765",
+    "publishedAt": "2026-02-16T14:15:00Z",
+    "content": "Meta Faces Regulatory Inquiries Over Instagram's Algorithmic Feed Recommendations in Multiple Markets",
+    "urlToImage": null
+  },
+  {
+    "source": {
+      "name": "Moneycontrol"
+    },
+    "author": "via Moneycontrol",
+    "title": "Meta delays new business terms after publishers raise concerns over AI data scraping",
+    "description": "Verified report from Moneycontrol covering trending content on Instagram.",
+    "url": "https://www.moneycontrol.com/technology/meta-delays-new-business-terms-after-publishers-raise-concerns-over-ai-data-scraping-article-14067295.html",
+    "urlToImage": null,
+    "publishedAt": null,
+    "content": "Meta delays new business terms after publishers raise concerns over AI data scraping"
   }
 ]

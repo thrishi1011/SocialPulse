@@ -64,12 +64,13 @@ async def _translate_with_mymemory(client: httpx.AsyncClient, text: str) -> str 
 
 async def _translate_batch_with_gemini(texts: list[str]) -> dict[str, str]:
     """Translate a batch of non-English strings into clean English using Gemini AI."""
-    if not settings.GEMINI_KEY or settings.MOCK_AI_MODE:
+    active_key = settings.GEMINI_KEY_SCRAP or settings.GEMINI_KEY
+    if not active_key or settings.MOCK_AI_MODE:
         return {}
 
     try:
         import google.generativeai as genai
-        genai.configure(api_key=settings.GEMINI_KEY)
+        genai.configure(api_key=active_key)
     except Exception as e:
         logger.error(f"Failed to configure Gemini for translation: {e}")
         return {}
@@ -86,6 +87,7 @@ INPUT STRINGS:
 
     gemini_rate_limiter.acquire()
     models_to_try = [
+        "gemini-3.5-flash-lite",
         "gemini-3.5-flash",
         "gemini-3.8-flash",
         "gemini-flash-latest",
