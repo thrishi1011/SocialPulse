@@ -15,26 +15,38 @@ class GoogleTrendsFetcher(AbstractFetcher):
     source_category = "B"
 
     async def fetch_raw(self) -> list[dict]:
-        """Fetch daily search trends from Google Trends live RSS feed for India, optionally enriched with state-level regional interest."""
-        rss_url = "https://trends.google.com/trending/rss?geo=IN"
+        """Fetch daily search trends from Google Trends live RSS feeds (IN and US for multi-region depth), optionally enriched with state-level regional interest."""
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        items = []
+        seen_queries = set()
 
         async with httpx.AsyncClient(timeout=8.0) as client:
-            resp = await client.get(rss_url, headers=headers)
-            resp.raise_for_status()
-            feed = feedparser.parse(resp.text)
-            items = []
-            for entry in feed.entries:
-                traffic = getattr(entry, "ht_approx_traffic", getattr(entry, "approx_traffic", "1K+"))
-                query = entry.title
-                link = entry.link or f"https://trends.google.com/trends/explore?q={query.replace(' ', '%20')}"
-                items.append({
-                    "query": query,
-                    "formatted_traffic": traffic,
-                    "url": link,
-                    "snippet": getattr(entry, "summary", f"Search interest detected for '{query}'."),
-                    "published": getattr(entry, "published", "")
-                })
+            for geo in ["IN", "US"]:
+                try:
+                    rss_url = f"https://trends.google.com/trending/rss?geo={geo}"
+                    resp = await client.get(rss_url, headers=headers)
+                    if resp.status_code == 200:
+                        feed = feedparser.parse(resp.text)
+                        for entry in feed.entries:
+                            query = getattr(entry, "title", "").strip()
+                            if not query or query.lower() in seen_queries:
+                                continue
+                            seen_queries.add(query.lower())
+                            traffic = getattr(entry, "ht_approx_traffic", getattr(entry, "approx_traffic", "1K+"))
+                            link = getattr(entry, "link", None) or f"https://trends.google.com/trends/explore?q={query.replace(' ', '%20')}"
+                            items.append({
+                                "query": query,
+                                "formatted_traffic": traffic,
+                                "url": link,
+                                "snippet": getattr(entry, "summary", f"Search interest detected for '{query}'."),
+                                "published": getattr(entry, "published", "")
+                            })
+                            if len(items) >= 25:
+                                break
+                except Exception as e:
+                    logger.debug(f"Google Trends RSS fetch error for {geo}: {e}")
+                if len(items) >= 25:
+                    break
 
             # Translate any non-English trending queries to English Latin script
             non_eng_queries = [it["query"] for it in items if it.get("query")]
@@ -48,7 +60,7 @@ class GoogleTrendsFetcher(AbstractFetcher):
                             it["original_query"] = orig
                             it["query"] = translations[orig]
                             if orig != translations[orig]:
-                                it["snippet"] = f"Trending Google Search topic in India: {translations[orig]} (Original: {orig})."
+                                it["snippet"] = f"Trending Google Search topic: {translations[orig]} (Original: {orig})."
                 except Exception as e:
                     logger.warning(f"Error during Google Trends translation: {e}")
 

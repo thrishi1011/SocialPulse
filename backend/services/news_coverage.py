@@ -41,59 +41,71 @@ _shared_semaphore = asyncio.Semaphore(8)
 # Query variants per platform (4-6 variants, with and without India)
 PLATFORM_QUERIES: dict[str, list[str]] = {
     "Instagram": [
-        '"Instagram" trending viral',
+        '"Instagram" politics India',
+        '"Instagram" election campaign India',
+        '"Instagram" government policy India',
+        '"Instagram" political controversy India',
         '"Instagram" reel viral India',
-        '"Instagram" update creator trends',
-        '"Instagram" backlash trend',
-        '"Instagram trend" India',
-        '"Instagram" viral video India',
-        '"Instagram" reels popular viral',
+        '"Instagram" trending viral India',
+        '"Instagram" update Meta news India',
         '"Instagram" influencer controversy trend'
     ],
     "Facebook": [
-        '"Facebook" viral post trend',
-        '"Facebook" viral debate India',
-        '"Facebook" community trend viral',
-        '"Facebook" Meta controversy trend',
-        '"Facebook" post sparks reaction India',
-        '"Facebook" viral video trend India',
-        '"Facebook" group viral controversy',
-        '"Facebook" viral news India'
+        '"Facebook" politics India',
+        '"Facebook" election debate India',
+        '"Facebook" government censorship controversy India',
+        '"Facebook" viral post politics India',
+        '"Facebook" Meta policy India',
+        '"Facebook" viral news India',
+        '"Facebook" political party rally viral',
+        '"Facebook" community trend viral India'
     ],
     "Twitter": [
-        '"Twitter" trending India viral',
-        '"X" trending "on X" viral',
-        '"Elon Musk" X trend debate',
-        '"X users" trend backlash',
-        '"viral tweet" trend reaction India'
+        '"Twitter" OR "X" politics India',
+        '"Twitter" OR "X" election trending India',
+        '"Twitter" OR "X" minister controversy India',
+        '"Elon Musk" X government India politics',
+        '"X" trending hashtags India politics',
+        '"Twitter" parliament session debate viral',
+        '"X users" trend backlash political',
+        '"viral tweet" politics India'
     ],
     "X (Twitter)": [
-        '"Twitter" trending India viral',
-        '"X" trending "on X" viral',
-        '"Elon Musk" X trend debate',
-        '"X users" trend backlash',
-        '"viral tweet" trend reaction India'
+        '"Twitter" OR "X" politics India',
+        '"Twitter" OR "X" election trending India',
+        '"Twitter" OR "X" minister controversy India',
+        '"Elon Musk" X government India politics',
+        '"X" trending hashtags India politics',
+        '"Twitter" parliament session debate viral',
+        '"X users" trend backlash political',
+        '"viral tweet" politics India'
     ],
     "X": [
-        '"Twitter" trending India viral',
-        '"X" trending "on X" viral',
-        '"Elon Musk" X trend debate',
-        '"X users" trend backlash',
-        '"viral tweet" trend reaction India'
+        '"Twitter" OR "X" politics India',
+        '"Twitter" OR "X" election trending India',
+        '"Twitter" OR "X" minister controversy India',
+        '"Elon Musk" X government India politics',
+        '"X" trending hashtags India politics',
+        '"Twitter" parliament session debate viral',
+        '"X users" trend backlash political',
+        '"viral tweet" politics India'
     ],
     "Reddit": [
-        '"Reddit" viral post debate',
-        '"Reddit" thread sparks viral India',
-        '"Reddit" community trend discussion',
-        '"Reddit users" react viral',
-        '"trending on Reddit"'
+        '"Reddit" politics India discussion',
+        '"Reddit" election debate viral India',
+        '"Reddit" government policy controversy India',
+        '"Reddit" users react politics India',
+        '"r/india" OR "Reddit" political trend',
+        '"Reddit" viral thread controversy India',
+        '"Reddit" trending community debate'
     ],
     "Twitch": [
-        '"Twitch" streamer viral drama',
-        '"Twitch" stream trend record',
-        '"Twitch" esports gaming tournament viral',
-        '"Twitch streamer" controversy ban',
-        '"Twitch livestream" reaction viral'
+        '"Twitch" streamer politics debate',
+        '"Twitch" broadcast controversy policy',
+        '"Twitch" gaming esports tournament viral India',
+        '"Twitch" streamer ban debate trending',
+        '"Twitch" livestream reaction controversy',
+        '"Twitch" streamer community debate'
     ]
 }
 
@@ -147,11 +159,14 @@ def is_valid_news_article(url: str, outlet_name: str | None) -> bool:
         return False
     return True
 
-def is_topically_relevant(title: str, snippet: str, platform_name: str) -> bool:
+def is_topically_relevant(title: str, snippet: str, platform_name: str, is_political: bool = False) -> bool:
     """
     Ensure the article is explicitly relevant to the platform and discusses a trend/viral event,
-    filtering out generic hospital, general political, or unrelated commercial news.
+    or political discourse associated with digital social networks.
     """
+    if is_political:
+        return True
+
     text = f"{title} {snippet}"
     if platform_name in ["Twitter", "X (Twitter)", "X"]:
         pattern = r"\b(x|twitter|tweet|tweets|retweet|elon musk|on x)\b"
@@ -167,13 +182,18 @@ def is_topically_relevant(title: str, snippet: str, platform_name: str) -> bool:
         pattern = rf"\b{re.escape(platform_name.lower())}\b"
 
     if not re.search(pattern, text, re.IGNORECASE):
-        return False
+        # Also match political reporting mentioning public leaders or policies
+        pol_pattern = r"\b(modi|rahul|bjp|congress|election|elections|minister|parliament|lok sabha|rajya sabha|supreme court|assembly|cabinet|rally|protest|policy|censorship|takedown|poll|polls|lawmaker|oppn)\b"
+        if not re.search(pol_pattern, text, re.IGNORECASE):
+            return False
 
     trend_pattern = (
         r"\b(trend|trending|viral|buzz|sparks?|debates?|reacts?|reaction|outcry|backlash|"
         r"video|clip|post|views?|challenge|shares?|internet|online|broadcast|record|ban|bans|"
         r"feature|algorithm|millions?|stars?|interview|fans?|community|discussions?|lawsuit|"
-        r"terms|feed|grid|update|notes?|creator|drama|stream|boycott)\b"
+        r"terms|feed|grid|update|notes?|creator|drama|stream|boycott|election|elections|"
+        r"politics|political|speech|rally|minister|leader|row|protest|takedown|censorship|"
+        r"campaign|party|polls?|court|bjp|congress|aap|modi|rahul|bill|verdict)\b"
     )
     return bool(re.search(trend_pattern, text, re.IGNORECASE))
 
@@ -287,7 +307,8 @@ async def _fetch_from_outlet(
                     summary_text = getattr(entry, "summary", "") or ""
                     clean_summary = BeautifulSoup(summary_text, "html.parser").get_text(strip=True)
 
-                    if not is_topically_relevant(clean_title, clean_summary, platform_name):
+                    is_pol_feed = "politic" in outlet_name.lower() or "national" in outlet_name.lower()
+                    if not is_topically_relevant(clean_title, clean_summary, platform_name, is_political=is_pol_feed):
                         stats[outlet_name]["failed"] += 1
                         continue
 
@@ -436,7 +457,7 @@ async def _fetch_single_google_query(
         decoded_items = []
         entry_tasks = [
             _decode_google_entry(entry, platform_name, outlet_key, stats)
-            for entry in feed.entries[:6]
+            for entry in feed.entries[:10]
         ]
         decoded_results = await asyncio.gather(*entry_tasks, return_exceptions=True)
         for res in decoded_results:
@@ -460,7 +481,7 @@ async def _fetch_from_google_news(
 
     tasks = [
         _fetch_single_google_query(client, q, platform_name, outlet_key, stats)
-        for q in query_variants[:3]
+        for q in query_variants[:6]
     ]
     query_results = await asyncio.gather(*tasks, return_exceptions=True)
     articles = []
@@ -469,64 +490,43 @@ async def _fetch_from_google_news(
             articles.extend(q_res)
     return articles
 
-def _supplement_news_with_gemini(platform_name: str, count: int = 15) -> list[dict]:
+async def _supplement_news_via_scraping(
+    client: httpx.AsyncClient,
+    platform_name: str,
+    needed: int,
+    seen_urls: set[str],
+    seen_title_tokens: list[set[str]],
+    stats: dict[str, dict[str, int]]
+) -> list[dict]:
     """
-    Use GEMINI_KEY_SCRAP to discover recent viral news coverage for the platform
-    when direct outlet and RSS coverage yields fewer than 15 items.
+    Perform extra web scraping using particular political and viral keywords via Google News RSS
+    without using any Gemini API key or tokens.
     """
-    from backend.config import settings
-    key = getattr(settings, "GEMINI_KEY_SCRAP", "") or getattr(settings, "GEMINI_KEY", "")
-    if not key or count <= 0:
-        return []
-    import json
-    import re
-    import google.generativeai as genai
-    genai.configure(api_key=key)
-
-    models_to_try = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-flash-lite-latest", "gemini-flash-latest"]
-    prompt = f"""You are SocialPulse News Intelligence. Return a JSON list of {count} recent (within last 7-10 days) verified journalistic news reports regarding trending, viral, creator, or community discussions about {platform_name} in India or worldwide.
-Return ONLY valid JSON matching this schema:
-[
-  {{
-    "source": {{"name": "News Outlet Name e.g. NDTV, The Indian Express, Times of India, TechCrunch, Mint, BBC, India Today"}},
-    "author": "via News Outlet",
-    "title": "Factual journalistic headline covering the {platform_name} trend, viral post, reel, video, or community reaction",
-    "description": "1-2 sentence journalistic summary explaining the viral moment or trend on {platform_name}.",
-    "url": "https://www.outlet.com/technology/article-slug",
-    "publishedAt": "2026-11-01T12:00:00Z"
-  }}
-]
-"""
-    for model_name in models_to_try:
-        try:
-            model = genai.GenerativeModel(model_name)
-            resp = model.generate_content(prompt)
-            clean = resp.text.strip()
-            match = re.search(r"\[\s*\{.*\}\s*\]", clean, re.DOTALL)
-            if not match:
+    extra_keywords = [
+        f'"{platform_name}" political viral India',
+        f'"{platform_name}" election debate India',
+        f'"{platform_name}" government controversy India',
+        f'"{platform_name}" minister speech viral',
+        f'"{platform_name}" social media reaction India'
+    ]
+    extra_articles = []
+    for q in extra_keywords:
+        if len(extra_articles) >= needed:
+            break
+        items = await _fetch_single_google_query(client, q, platform_name, "Extra Keyword Scrape", stats)
+        for it in items:
+            raw_url = it.get("url", "")
+            clean_url = normalize_url(raw_url).lower()
+            if not clean_url or clean_url in seen_urls:
                 continue
-            raw_json = match.group(0)
-            try:
-                items = json.loads(raw_json, strict=False)
-            except Exception:
-                import re as _re
-                sanitized = _re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', raw_json)
-                items = json.loads(sanitized, strict=False)
-            res = []
-            for it in items:
-                if isinstance(it, dict) and it.get("title") and it.get("url"):
-                    it["source"] = it.get("source") or {"name": "News Outlet"}
-                    it["author"] = it.get("author") or f"via {it['source'].get('name', 'News Outlet')}"
-                    it["content"] = it["title"][:200]
-                    it["urlToImage"] = None
-                    res.append(it)
-            if len(res) > 0:
-                logger.info(f"[{platform_name}] Gemini news supplement successfully fetched {len(res)} items using {model_name}.")
-                return res
-        except Exception as e:
-            logger.warning(f"[{platform_name}] Gemini news supplement attempt with {model_name} notice: {e}")
-            continue
-    return []
+            if is_near_duplicate_title(it.get("title", ""), seen_title_tokens, threshold=0.8):
+                continue
+            seen_urls.add(clean_url)
+            seen_title_tokens.append(normalize_title_tokens(it.get("title", "")))
+            extra_articles.append(it)
+            if len(extra_articles) >= needed:
+                break
+    return extra_articles
 
 async def fetch_news_for_platform(
     platform_name: str,
@@ -595,16 +595,13 @@ async def fetch_news_for_platform(
         seen_title_tokens.append(normalize_title_tokens(raw_title))
         deduped_articles.append(art)
 
-    # 3. If below 16 items, supplement with Gemini news scraping discovery using GEMINI_KEY_SCRAP
-    if len(deduped_articles) < 16:
-        needed = max(14, 20 - len(deduped_articles))
-        supplemented = _supplement_news_with_gemini(platform_name, count=needed)
-        for art in supplemented:
-            clean_url = normalize_url(art.get("url", "")).lower()
-            if clean_url and clean_url not in seen_urls and not is_near_duplicate_title(art.get("title", ""), seen_title_tokens, threshold=0.8):
-                seen_urls.add(clean_url)
-                seen_title_tokens.append(normalize_title_tokens(art.get("title", "")))
-                deduped_articles.append(art)
+    # 3. If below 35 items, supplement via targeted keyword web scraping (ZERO API keys used)
+    if len(deduped_articles) < 52:
+        needed = 55 - len(deduped_articles)
+        extra = await _supplement_news_via_scraping(
+            client, platform_name, needed, seen_urls, seen_title_tokens, stats
+        )
+        deduped_articles.extend(extra)
 
     # 4. Rank by recency: items with a real publishedAt date sorted first (descending), followed by None
     def sort_key(a: dict) -> tuple[int, datetime]:
@@ -620,7 +617,7 @@ async def fetch_news_for_platform(
     deduped_articles.sort(key=sort_key, reverse=True)
 
     # 5. Cap at 25 items per platform (guaranteeing 15-25 items)
-    final_articles = deduped_articles[:25]
+    final_articles = deduped_articles[:55]
 
     # 5. Print per-outlet summary
     print(f"\n========================================================")
@@ -636,7 +633,7 @@ async def fetch_news_for_platform(
             print(f" {outlet_name:<28} | {s['found']:<6} | {s['kept']:<6} | {s['failed']:<6}")
     print(f" -------------------------------------------------------")
     print(f" Total Across Outlets: Found {total_found}, Kept {total_kept}, Failed {total_failed}")
-    print(f" Final Selected (after dedup & cap 20): {len(final_articles)}")
+    print(f" Final Selected (after dedup & cap 45): {len(final_articles)}")
     print(f"========================================================\n")
 
     # Update cache

@@ -192,7 +192,15 @@ class AbstractFetcher(ABC):
 
             for item in normalized_items:
                 full_text = f"{item.title} {item.description or ''}".strip()
-                initial_cat_name = classify_category_heuristic(full_text, default_source=source.slug).lower()
+                default_slug = source.slug
+                if item.raw_json:
+                    try:
+                        raw_dict = json.loads(item.raw_json)
+                        if raw_dict.get("_is_news_category") or raw_dict.get("snippet", {}).get("categoryId") == "25":
+                            default_slug = "youtube_news"
+                    except Exception:
+                        pass
+                initial_cat_name = classify_category_heuristic(full_text, default_source=default_slug).lower()
                 initial_cat_id = cat_map.get(initial_cat_name, default_cat_id)
                 initial_loc = item.location_india or detect_indian_location_heuristic(full_text)
 

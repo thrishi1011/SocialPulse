@@ -16,6 +16,46 @@ class NewsOutletConfig(TypedDict):
 
 # Curated list of outlets verified to return HTTP 200 with active articles / feeds
 NEWS_OUTLETS: list[NewsOutletConfig] = [
+    # 0a. Indian Express Political Pulse (Direct Political Journalism)
+    {
+        "name": "Indian Express Politics",
+        "base_domain": "https://indianexpress.com",
+        "rss_url": "https://indianexpress.com/section/political-pulse/feed/",
+        "section_urls": ["https://indianexpress.com/section/political-pulse/"],
+        "tags": ["Instagram", "Facebook", "Twitter", "X (Twitter)", "X", "Reddit", "Twitch"]
+    },
+    # 0b. The Hindu National & Politics
+    {
+        "name": "The Hindu Politics",
+        "base_domain": "https://www.thehindu.com",
+        "rss_url": "https://www.thehindu.com/news/national/feeder/default.rss",
+        "section_urls": ["https://www.thehindu.com/news/national/"],
+        "tags": ["Instagram", "Facebook", "Twitter", "X (Twitter)", "X", "Reddit", "Twitch"]
+    },
+    # 0c. NDTV India National & Political News
+    {
+        "name": "NDTV Politics",
+        "base_domain": "https://www.ndtv.com",
+        "rss_url": "https://feeds.feedburner.com/ndtvnews-india-news",
+        "section_urls": ["https://www.ndtv.com/india-news"],
+        "tags": ["Instagram", "Facebook", "Twitter", "X (Twitter)", "X", "Reddit", "Twitch"]
+    },
+    # 0d. News18 India National & Politics
+    {
+        "name": "News18 Politics",
+        "base_domain": "https://www.news18.com",
+        "rss_url": "https://www.news18.com/commonfeeds/v1/eng/rss/india.xml",
+        "section_urls": ["https://www.news18.com/india/"],
+        "tags": ["Instagram", "Facebook", "Twitter", "X (Twitter)", "X", "Reddit", "Twitch"]
+    },
+    # 0e. Livemint Policy & Politics
+    {
+        "name": "Mint Politics",
+        "base_domain": "https://www.livemint.com",
+        "rss_url": "https://www.livemint.com/rss/politics",
+        "section_urls": ["https://www.livemint.com/politics"],
+        "tags": ["Instagram", "Facebook", "Twitter", "X (Twitter)", "X", "Reddit", "Twitch"]
+    },
     # 1. The Indian Express
     {
         "name": "The Indian Express",

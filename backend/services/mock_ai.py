@@ -321,7 +321,14 @@ CATEGORY_KEYWORDS = [
         "rajya sabha", "supreme court", "government", "policy", "modi", "rahul",
         "kejriwal", "chief minister", "cm", "mla", "mp", "bill", "constitution",
         "assembly", "judiciary", "cabinet", "protest", "strike", "rally", "court",
-        "verdict", "aatmanirbhar", "sanatan", "neet"
+        "verdict", "aatmanirbhar", "sanatan", "neet", "politics", "political",
+        "poll", "polls", "electoral", "oppn", "opposition", "pm", "prime minister",
+        "amit shah", "sonia gandhi", "mamata", "aap", "trinamool", "dmk", "aiadmk",
+        "sp", "bsp", "cpi", "governor", "ordinance", "sc", "high court", "bench",
+        "takedown", "censorship", "banned", "lawmaker", "party", "parties", "coalition",
+        "leader", "leaders", "communist", "hindutva", "secular", "nationalist",
+        "campaign", "candidate", "constituency", "by-election", "byelection", "manifesto",
+        "sansad", "sansad tv", "rajya sabha tv", "lok sabha tv", "elections", "cabinet minister"
     ]),
     ("Health", [
         "covid", "virus", "health", "hospital", "doctor", "medicine", "vaccine",
@@ -400,6 +407,8 @@ def classify_category_heuristic(text: str, default_source: str = "") -> str:
 
     # Source-based defaults if no keyword match
     source_lower = default_source.lower()
+    if "youtube_news" in source_lower or "news_politics" in source_lower or "political" in source_lower:
+        return "Politics"
     if "twitch" in source_lower:
         return "Gaming"
     if "youtube" in source_lower:

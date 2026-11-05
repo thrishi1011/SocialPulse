@@ -19,5 +19,159 @@
     "description": "UEFA Champions League 2026/27 league phase matchups revealed in Monaco.",
     "link": "https://bsky.app/search?q=%23UCLdraw",
     "count": 9800
+  },
+  {
+    "topic": "Indian Elections",
+    "displayName": "Lok Sabha Assembly Debates",
+    "description": "Key political rallies and policy debates unfold across state capitals.",
+    "link": "https://bsky.app/search?q=Indian%20Politics",
+    "count": 21500
+  },
+  {
+    "topic": "Open Source LLMs",
+    "displayName": "#OpenSourceAI",
+    "description": "Developers discuss new efficient architectures outperforming closed models on local hardware.",
+    "link": "https://bsky.app/search?q=%23OpenSourceAI",
+    "count": 12400
+  },
+  {
+    "topic": "Mars Sample Return",
+    "displayName": "Perseverance Mars",
+    "description": "NASA confirms next milestone in Martian core sample retrieval mission planning.",
+    "link": "https://bsky.app/search?q=Mars%20Sample",
+    "count": 8900
+  },
+  {
+    "topic": "Indie Game Festival",
+    "displayName": "#IndieGames2026",
+    "description": "Showcase of upcoming pixel art RPGs and atmospheric puzzle games goes viral.",
+    "link": "https://bsky.app/search?q=%23IndieGames2026",
+    "count": 7650
+  },
+  {
+    "topic": "Renewable Energy Grid",
+    "displayName": "Solar Grid Breakthrough",
+    "description": "India and EU report record solar power generation milestones exceeding seasonal forecasts.",
+    "link": "https://bsky.app/search?q=Renewable%20Energy",
+    "count": 11300
+  },
+  {
+    "topic": "Cybersecurity Policy",
+    "displayName": "Zero Trust Protocol",
+    "description": "Government agencies update zero trust architecture requirements for digital infrastructure.",
+    "link": "https://bsky.app/search?q=Zero%20Trust",
+    "count": 6400
+  },
+  {
+    "topic": "World Cup Qualifiers",
+    "displayName": "#FIFAWorldCup",
+    "description": "Intense group stage fixtures decide continental tournament seeding.",
+    "link": "https://bsky.app/search?q=%23FIFAWorldCup",
+    "count": 19800
+  },
+  {
+    "topic": "Quantum Computing Roadmap",
+    "displayName": "Quantum Error Correction",
+    "description": "Physicists achieve fault-tolerant logical qubit breakthrough in lab tests.",
+    "link": "https://bsky.app/search?q=Quantum%20Computing",
+    "count": 8200
+  },
+  {
+    "topic": "Urban Transit Modernization",
+    "displayName": "Vande Bharat Express",
+    "description": "High-speed rail connectivity expands to five new industrial corridors.",
+    "link": "https://bsky.app/search?q=Vande%20Bharat",
+    "count": 16400
+  },
+  {
+    "topic": "Space Station Resupply",
+    "displayName": "Cargo Dragon Launch",
+    "description": "Commercial resupply mission docks successfully with the orbital research complex.",
+    "link": "https://bsky.app/search?q=Cargo%20Dragon",
+    "count": 5900
+  },
+  {
+    "topic": "Global Economic Outlook",
+    "displayName": "IMF Growth Forecast",
+    "description": "Quarterly economic projections highlight strong emerging market resilience.",
+    "link": "https://bsky.app/search?q=IMF%20Forecast",
+    "count": 9100
+  },
+  {
+    "topic": "Anime World Premiere",
+    "displayName": "#AnimeExpo",
+    "description": "Highly anticipated fantasy sequel trailer drops ahead of fall broadcast.",
+    "link": "https://bsky.app/search?q=%23AnimeExpo",
+    "count": 15300
+  },
+  {
+    "topic": "Electric Aviation",
+    "displayName": "eVTOL Flight Certification",
+    "description": "Urban air mobility prototypes complete suburban passenger safety trials.",
+    "link": "https://bsky.app/search?q=eVTOL%20Flight",
+    "count": 4800
+  },
+  {
+    "topic": "Supreme Court Bench",
+    "displayName": "Constitutional Bench Hearing",
+    "description": "Seven-judge bench convenes on key federal taxation and center-state disputes.",
+    "link": "https://bsky.app/search?q=Supreme%20Court%20Hearing",
+    "count": 13900
+  },
+  {
+    "topic": "Cricket Test Championship",
+    "displayName": "#WTCFinals",
+    "description": "Points table heats up as teams battle in final series for Lord's showdown.",
+    "link": "https://bsky.app/search?q=%23WTCFinals",
+    "count": 22100
+  },
+  {
+    "topic": "Biomedical Gene Therapy",
+    "displayName": "CRISPR Rare Disease Cure",
+    "description": "Clinical trials show promising long-term remission in sickle cell patients.",
+    "link": "https://bsky.app/search?q=CRISPR%20Therapy",
+    "count": 6700
+  },
+  {
+    "topic": "Semiconductor Fab Expansion",
+    "displayName": "India Semiconductor Mission",
+    "description": "Commercial chip fabrication facility in Gujarat begins pilot production runs.",
+    "link": "https://bsky.app/search?q=Semiconductor%20Mission",
+    "count": 10500
+  },
+  {
+    "topic": "Digital Privacy Bill",
+    "displayName": "Data Protection Rules",
+    "description": "Citizens and privacy advocates review newly notified cross-border data transfer guidelines.",
+    "link": "https://bsky.app/search?q=Data%20Protection",
+    "count": 8700
+  },
+  {
+    "topic": "Deep Sea Exploration",
+    "displayName": "Samudrayaan Mission",
+    "description": "Deep-ocean submersible Matsya 6000 completes shallow water pressure integrity tests.",
+    "link": "https://bsky.app/search?q=Samudrayaan",
+    "count": 5300
+  },
+  {
+    "topic": "Film Festival Honors",
+    "displayName": "#Cannes2026",
+    "description": "Independent Indian cinema receives standing ovation at international festival.",
+    "link": "https://bsky.app/search?q=%23Cannes2026",
+    "count": 12800
+  },
+  {
+    "topic": "Global Climate Summit",
+    "displayName": "COP Adaptation Fund",
+    "description": "Delegates finalize loss and damage allocation framework for developing nations.",
+    "link": "https://bsky.app/search?q=COP%20Climate%20Summit",
+    "count": 9400
+  },
+  {
+    "topic": "Monsoon Agricultural Output",
+    "displayName": "Kharif Crop Estimates",
+    "description": "Ministry releases optimistic foodgrain production targets following timely seasonal rains.",
+    "link": "https://bsky.app/search?q=Kharif%20Crops",
+    "count": 7100
   }
 ]

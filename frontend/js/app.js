@@ -349,13 +349,7 @@ function renderTrendsGrid() {
       `;
     }
 
-    // AI Summary display
-    const aiSummaryHTML = item.ai_summary ? `
-      <div class="ai-summary-box">
-        <div class="ai-summary-header">✨ Why It's Trending</div>
-        <div class="ai-summary-text">${escapeHTML(item.ai_summary)}</div>
-      </div>
-    ` : "";
+    const aiSummaryHTML = "";
 
     let timeHTML = "";
     if (item.source.slug === "youtube" && item.published_at) {
@@ -397,7 +391,6 @@ function renderTrendsGrid() {
             <h2 class="card-title" title="${escapeHTML(item.title)}">${escapeHTML(item.title)}</h2>
             ${item.author ? `<div class="card-author">${escapeHTML(item.author)}</div>` : ""}
             ${metricHTML ? `<div class="metric-row">${metricHTML}</div>` : ""}
-            ${aiSummaryHTML}
           </div>
         </div>
 
@@ -563,13 +556,7 @@ async function openDetailDrawer(itemId) {
 
       ${item.description ? `<p style="font-size:14px; line-height:1.6; color:var(--text-secondary); margin-bottom:20px;">${escapeHTML(item.description)}</p>` : ""}
 
-      <!-- AI Summary -->
-      ${item.ai_summary ? `
-        <div class="ai-summary-box" style="margin:20px 0;">
-          <div class="ai-summary-header" style="font-size:13px;">✨ AI Intelligence Summary (Gemini)</div>
-          <p class="ai-summary-text" style="font-size:14px; margin-top:6px;">${escapeHTML(item.ai_summary)}</p>
-        </div>
-      ` : ""}
+
 
       <!-- Trend History & Velocity Section -->
       <div class="drawer-history-section">
