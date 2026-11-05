@@ -176,8 +176,8 @@ def get_trends(
     if recency in hours_map:
         cutoff = now - timedelta(hours=hours_map[recency])
         recent_query = query.filter(effective_time >= cutoff)
-        # If filtering by a specific source resulted in 0 items, relax the recency cutoff so the user always sees content
-        if source and recent_query.count() == 0:
+        # If recency filter yields 0 items, relax cutoff so stored news is always preserved and displayed
+        if recent_query.count() == 0:
             pass
         else:
             query = recent_query
@@ -422,6 +422,9 @@ def get_item_comments(
 
     if not item:
         raise HTTPException(status_code=404, detail=f"Trending item with ID {item_id} not found.")
+
+    if not item.source or item.source.slug != "youtube":
+        return format_comments_response([])
 
     comments = get_or_create_item_comments(db, item, limit=limit)
     return format_comments_response(comments)

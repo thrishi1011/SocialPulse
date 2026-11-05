@@ -195,3 +195,26 @@ def test_top_10_comments_retrieval(db_session):
     response = get_item_comments(item_id=item2.id, db=db_session)
     assert response.total == 10
     assert len(response.comments) == 10
+
+
+def test_non_youtube_item_returns_zero_comments(db_session):
+    src_reddit = db_session.query(Source).filter(Source.slug == 'reddit').first()
+    item_reddit = TrendingItem(
+        source_id=src_reddit.id,
+        external_id='reddit_test_item',
+        title='Discussion on tech trends',
+        description='Tech commentary',
+        url='https://reddit.com/r/technology',
+        source_category='A',
+        fetched_at=datetime.utcnow()
+    )
+    db_session.add(item_reddit)
+    db_session.commit()
+
+    # Comments are strictly restricted to YouTube only
+    raw_comments = get_or_create_item_comments(db_session, item_reddit, limit=10)
+    assert len(raw_comments) == 0
+
+    response = get_item_comments(item_id=item_reddit.id, db=db_session)
+    assert response.total == 0
+    assert len(response.comments) == 0

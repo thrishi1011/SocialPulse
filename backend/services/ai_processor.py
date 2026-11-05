@@ -321,7 +321,27 @@ ITEMS TO ANALYZE:
             logger.error(f"Gemini API error during batch with '{model_name}': {e}")
             continue
 
-    # Fall back to single-item calls only for items missing from the response
+    # If batch call failed (e.g. 429 quota exhausted), fall back to offline heuristic summaries immediately
+    # to avoid launching dozens of doomed single-item API calls and spamming the console.
+    if not batch_success:
+        logger.warning(f"All Gemini models exhausted or unavailable for batch. Using offline contextual intelligence to store news summaries.")
+        for item in batch:
+            plat = item.source.display_name if item.source else "Social Platform"
+            summary_text, cat_name, loc_india, is_trend = get_mock_ai_summary(
+                plat.lower().replace(" ", "_"),
+                item.title,
+                item.description or ""
+            )
+            results[item.id] = {
+                "summary": summary_text,
+                "category": cat_name,
+                "location_india": loc_india,
+                "is_platform_trend": is_trend,
+                "success": True
+            }
+        return results
+
+    # Fall back to single-item calls only for individual items genuinely missing from a successful batch
     for item in batch:
         if item.id not in results:
             plat = item.source.display_name if item.source else "Social Platform"

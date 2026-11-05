@@ -114,6 +114,10 @@ INPUT STRINGS:
             if isinstance(mapping, dict):
                 return {k: str(v).strip() for k, v in mapping.items() if v}
         except Exception as e:
+            err_str = str(e)
+            if "429" in err_str or "quota" in err_str.lower():
+                logger.warning("Gemini translation quota reached (429). Falling back to offline translation.")
+                break
             logger.warning(f"Translation with {model_name} failed: {e}. Trying next...")
             continue
 

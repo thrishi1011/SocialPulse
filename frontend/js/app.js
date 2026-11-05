@@ -483,12 +483,16 @@ async function openDetailDrawer(itemId) {
   drawer.classList.add("open");
 
   try {
-    const [item, history, commentsData] = await Promise.all([
-      api.getTrendById(itemId),
-      api.getTrendHistory(itemId).catch(() => ({ snapshots: [] })),
-      api.getItemComments(itemId, 10).catch(() => ({ total: 0, comments: [], sentiment_breakdown: {} }))
-    ]);
+    const item = await api.getTrendById(itemId);
     const isCatA = item.source_category === "A";
+    const isYouTube = item.source && item.source.slug === "youtube";
+
+    const [history, commentsData] = await Promise.all([
+      api.getTrendHistory(itemId).catch(() => ({ snapshots: [] })),
+      isYouTube
+        ? api.getItemComments(itemId, 10).catch(() => ({ total: 0, comments: [], sentiment_breakdown: {} }))
+        : Promise.resolve({ total: 0, comments: [], sentiment_breakdown: {} })
+    ]);
 
     let provenanceDescription = "";
     let ctaButtonCopy = `View on ${escapeHTML(item.source.display_name)} →`;
@@ -578,24 +582,26 @@ async function openDetailDrawer(itemId) {
         `}
       </div>
 
-      <!-- Sourced Community Reactions & Comments Section -->
-      <div class="drawer-comments-section">
-        <div class="drawer-comments-header">
-          <div class="drawer-comments-title-wrap">
-            <span class="drawer-comments-title">💬 Sourced Community Reactions</span>
-            <span class="comments-count-pill">${commentsData.total || 0} reactions</span>
+      <!-- Sourced Community Reactions & Comments Section (YouTube Only) -->
+      ${isYouTube ? `
+        <div class="drawer-comments-section">
+          <div class="drawer-comments-header">
+            <div class="drawer-comments-title-wrap">
+              <span class="drawer-comments-title">💬 YouTube Community Comments</span>
+              <span class="comments-count-pill">${commentsData.total || 0} comments</span>
+            </div>
+            <div class="comments-sentiment-strip">
+              ${renderSentimentBreakdownHTML(commentsData.sentiment_breakdown, commentsData.total)}
+            </div>
           </div>
-          <div class="comments-sentiment-strip">
-            ${renderSentimentBreakdownHTML(commentsData.sentiment_breakdown, commentsData.total)}
+          <div class="drawer-comments-list">
+            ${commentsData.comments && commentsData.comments.length > 0
+              ? commentsData.comments.map(c => renderCommentCardHTML(c)).join("")
+              : `<div class="comments-empty-notice">No comments available for this video.</div>`
+            }
           </div>
         </div>
-        <div class="drawer-comments-list">
-          ${commentsData.comments && commentsData.comments.length > 0
-            ? commentsData.comments.map(c => renderCommentCardHTML(c)).join("")
-            : `<div class="comments-empty-notice">No community comments recorded for this item yet.</div>`
-          }
-        </div>
-      </div>
+      ` : ""}
 
       <!-- Data Source Provenance Box -->
       <div class="provenance-card" style="margin-top:20px;">

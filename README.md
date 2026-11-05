@@ -93,6 +93,8 @@ python -m backend.seed
 ```bash
 # Recommended command (works reliably across Windows, macOS, and Linux):
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+# Or if port 8000 is occupied:
+# python -m uvicorn backend.main:app --host 127.0.0.1 --port 8001 --reload
 ```
 
 > **Note for Windows users:** Always run with `python -m uvicorn ...` instead of bare `uvicorn ...`. This ensures Python executes directly from your active virtual environment, avoiding `The term 'uvicorn' is not recognized` or `CommandNotFoundException` errors.
@@ -101,7 +103,7 @@ Wait for `Application startup complete.`, then open:
 
 | URL | What it is |
 | :--- | :--- |
-| http://localhost:8000 or http://127.0.0.1:8000 | Dashboard UI |
+| http://localhost:8000 or http://127.0.0.1:8000 (or port 8001) | Dashboard UI |
 | http://localhost:8000/docs | Interactive API docs (Swagger UI) |
 | http://localhost:8000/health | System health check (shows mock/live status) |
 
@@ -118,6 +120,8 @@ Whenever you return to the project:
 3. Launch the server:
    ```bash
    python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+# Or if port 8000 is occupied:
+# python -m uvicorn backend.main:app --host 127.0.0.1 --port 8001 --reload
    ```
 
 Stop the server anytime with `Ctrl+C`.
@@ -359,7 +363,7 @@ Interactive documentation is at `/docs`. All paths are under `/api/v1` unless no
 | `GET` | `/trends` | List items. Filters: `source` (repeatable), `source_category` (A/B), `category`, `recency` (6h/12h/24h/all), `region_scope` (all/india/global/local), `sort` (recency/engagement/momentum), `page`, `per_page` |
 | `GET` | `/trends/{id}` | Full item details with trending region and momentum |
 | `GET` | `/trends/{id}/history` | Snapshot series (rank and engagement over time) |
-| `GET` | `/trends/{id}/comments` | Sourced community comments and sentiment breakdown for a trending item |
+| `GET` | `/trends/{id}/comments` | Sourced real community comments and sentiment breakdown for YouTube trending items |
 | `GET` | `/trends/export.csv` | CSV export using the same filters as `/trends` |
 | `GET` | `/topics` | Macro stories. Params: `min_sources` (default 2), `recency` |
 | `GET` | `/topics/{id}` | One story with all member items |

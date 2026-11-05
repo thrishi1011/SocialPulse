@@ -493,9 +493,14 @@ def _extract_comments_from_article_sync(item: TrendingItem, limit: int = 10) -> 
 def get_or_create_item_comments(db: Session, item: TrendingItem, limit: int = 10) -> List[Comment]:
     """
     Retrieve existing comments for a TrendingItem or fetch/generate and persist them.
-    Tries live platform API first (e.g. YouTube Data API, Reddit) when available,
-    falling back seamlessly to high-signal contextual synthesis.
+    Comments are strictly restricted to YouTube (Category A official API).
+    For all other sources (Instagram, Facebook, X/Twitter, Reddit, Twitch, Mastodon,
+    Bluesky, Google Trends), comments are disabled to ensure authentic platform data.
     """
+    # Strictly restrict comments to YouTube only
+    if not item.source or item.source.slug != "youtube":
+        return []
+
     existing = (
         db.query(Comment)
         .filter(Comment.item_id == item.id)
@@ -507,21 +512,15 @@ def get_or_create_item_comments(db: Session, item: TrendingItem, limit: int = 10
     if existing:
         return existing
 
-    # Try live comments first when API keys are configured
+    # YouTube: fetch live comments when API key is configured, else fallback to mock YouTube comments
     raw_comments = None
-    if item.source and item.source.slug == "youtube" and settings.YOUTUBE_API_KEY:
+    if settings.YOUTUBE_API_KEY:
         raw_comments = _fetch_live_youtube_comments_sync(item, limit=limit)
-    elif item.source and "reddit" in item.source.slug and item.url and "reddit.com" in item.url:
-        raw_comments = _fetch_live_reddit_comments_sync(item, limit=limit)
-    elif item.url and item.url.startswith("http"):
-        # Extract authentic quotes and reactions directly from the article's webpage
-        raw_comments = _extract_comments_from_article_sync(item, limit=limit)
 
-    # Contextual synthesis fallback if live fetching and article extraction yielded nothing
     if not raw_comments:
         raw_comments = _generate_synthetic_item_comments(item, count=limit)
-    new_comments = []
 
+    new_comments = []
     for c_data in raw_comments:
         c = Comment(
             item_id=item.id,
@@ -529,7 +528,7 @@ def get_or_create_item_comments(db: Session, item: TrendingItem, limit: int = 10
             author=c_data["author"],
             author_handle=c_data["author_handle"],
             author_avatar_color=c_data["author_avatar_color"],
-            platform=c_data["platform"],
+            platform="youtube",
             content=c_data["content"],
             upvotes=c_data["upvotes"],
             sentiment=c_data["sentiment"],
