@@ -488,12 +488,9 @@ async function openDetailDrawer(itemId) {
     const sourceSlug = item.source ? item.source.slug : "";
     const hasComments = ["youtube", "mastodon", "bluesky"].includes(sourceSlug);
 
-    const [history, commentsData] = await Promise.all([
-      api.getTrendHistory(itemId).catch(() => ({ snapshots: [] })),
-      hasComments
-        ? api.getItemComments(itemId, 10).catch(() => ({ total: 0, comments: [], sentiment_breakdown: {} }))
-        : Promise.resolve({ total: 0, comments: [], sentiment_breakdown: {} })
-    ]);
+    const commentsData = hasComments
+      ? await api.getItemComments(itemId, 10).catch(() => ({ total: 0, comments: [], sentiment_breakdown: {} }))
+      : { total: 0, comments: [], sentiment_breakdown: {} };
 
     let commentsSectionTitle = "💬 Community Comments";
     let commentsCountLabel = "comments";
@@ -539,7 +536,7 @@ async function openDetailDrawer(itemId) {
       ? `${escapeHTML(item.author)} · ${(item.source.slug === 'youtube' && item.published_at) ? `Published ${timeAgo(item.published_at)} (Trending ${timeAgo(item.fetched_at)})` : timeAgo(item.published_at || item.fetched_at)}`
       : ((item.source.slug === 'youtube' && item.published_at) ? `Published ${timeAgo(item.published_at)} (Trending ${timeAgo(item.fetched_at)})` : timeAgo(item.published_at || item.fetched_at));
 
-    const hasSnapshots = history.snapshots && history.snapshots.length >= 2;
+
 
     content.innerHTML = `
       <div class="drawer-header-bar">
@@ -561,7 +558,6 @@ async function openDetailDrawer(itemId) {
         <div class="drawer-tags-cluster">
           <span class="category-pill">${escapeHTML(item.category ? item.category.name : "Trending")}</span>
           ${regionChipHTML(item.trending_region)}
-          ${getMomentumBadgeHTML(item.momentum)}
         </div>
         <div class="drawer-meta-author-time">
           ${timeAndAuthorText}
@@ -580,25 +576,7 @@ async function openDetailDrawer(itemId) {
 
 
 
-      <!-- Trend History & Velocity Section -->
-      <div class="drawer-history-section">
-        <div class="drawer-history-header">
-          <span class="drawer-history-title">📈 Trend Velocity & History</span>
-          <span class="chart-badge">${history.snapshots ? history.snapshots.length : 0} observations</span>
-        </div>
-        ${hasSnapshots ? `
-          <div class="drawer-chart-container">
-            <canvas id="drawer-history-chart"></canvas>
-          </div>
-          <div class="history-explanation-text">
-            ${escapeHTML(getMomentumExplanation(item.momentum))}
-          </div>
-        ` : `
-          <div class="history-explanation-text" style="border-left-color: #94a3c2;">
-            Momentum needs a few fetch cycles to appear. Snapshots are recorded on each scheduled run.
-          </div>
-        `}
-      </div>
+
 
       <!-- Sourced Community Reactions & Comments Section (Category A: YouTube, Mastodon, Bluesky) -->
       ${hasComments ? `
@@ -643,58 +621,7 @@ async function openDetailDrawer(itemId) {
       });
     }
 
-    // Render Drawer History Line Chart if snapshots available
-    if (hasSnapshots && window.Chart) {
-      const histCanvas = content.querySelector("#drawer-history-chart");
-      if (histCanvas) {
-        const hasEng = history.snapshots.some(s => s.engagement_value !== null);
-        const chartData = hasEng
-          ? history.snapshots.map(s => s.engagement_value || 0)
-          : history.snapshots.map(s => s.rank || 0);
 
-        new window.Chart(histCanvas, {
-          type: "line",
-          data: {
-            labels: history.snapshots.map(s => new Date(s.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })),
-            datasets: [{
-              label: hasEng ? "Engagement" : "Rank",
-              data: chartData,
-              borderColor: "#2dd4c8",
-              backgroundColor: "rgba(45, 212, 200, 0.12)",
-              fill: true,
-              tension: 0.3,
-              pointRadius: 4,
-              pointBackgroundColor: "#2dd4c8"
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                backgroundColor: "#121729",
-                titleColor: "#e7ebf5",
-                bodyColor: "#94a3c2",
-                borderColor: "rgba(148, 163, 184, 0.25)",
-                borderWidth: 1
-              }
-            },
-            scales: {
-              x: {
-                grid: { display: false },
-                ticks: { color: "#94a3c2", font: { family: "JetBrains Mono", size: 10 } }
-              },
-              y: {
-                reverse: !hasEng,
-                grid: { color: "rgba(148, 163, 184, 0.08)" },
-                ticks: { color: "#94a3c2", font: { family: "JetBrains Mono", size: 10 }, precision: 0 }
-              }
-            }
-          }
-        });
-      }
-    }
   } catch (err) {
     content.innerHTML = `<div style="color:var(--negative); padding:20px;">Failed to load item: ${escapeHTML(err.message)}</div>`;
   }
