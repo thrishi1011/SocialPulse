@@ -289,6 +289,190 @@ def _fetch_live_youtube_comments_sync(item: TrendingItem, limit: int = 10) -> Op
         return None
 
 
+
+
+def _fetch_live_mastodon_comments_sync(item: TrendingItem, limit: int = 10) -> Optional[List[Dict[str, Any]]]:
+    """Attempt live comment/post fetching from Mastodon when API key configured."""
+    if not (item.source and item.source.slug == "mastodon"):
+        return None
+
+    import httpx
+    from bs4 import BeautifulSoup
+
+    base_url = settings.MASTODON_BASE_URL or "https://mastodon.social"
+    headers = {"User-Agent": "SocialPulse/1.0"}
+    if settings.MASTODON_API_KEY:
+        headers["Authorization"] = f"Bearer {settings.MASTODON_API_KEY}"
+
+    posts = []
+    try:
+        with httpx.Client(timeout=6.0, headers=headers) as client:
+            ext_id = item.external_id or ""
+            if ext_id.startswith("tag_"):
+                tag_name = ext_id.replace("tag_", "")
+                resp = client.get(f"{base_url}/api/v1/timelines/tag/{tag_name}", params={"limit": limit})
+                if resp.status_code == 200:
+                    posts = resp.json()
+            elif ext_id.startswith("mastodon_status_"):
+                status_id = ext_id.replace("mastodon_status_", "")
+                resp = client.get(f"{base_url}/api/v1/statuses/{status_id}/context")
+                if resp.status_code == 200:
+                    posts = resp.json().get("descendants", [])
+
+            if not posts and item.title:
+                clean_q = re.sub(r"[^\w\s]", "", item.title).strip().split()
+                if clean_q:
+                    tag_cand = clean_q[0].lstrip("#")
+                    resp = client.get(f"{base_url}/api/v1/timelines/tag/{tag_cand}", params={"limit": limit})
+                    if resp.status_code == 200:
+                        posts = resp.json()
+
+            if not posts:
+                return None
+
+            parsed_comments = []
+            for p in posts[:limit]:
+                account = p.get("account", {})
+                author = account.get("display_name") or account.get("username") or "Mastodon User"
+                acct = account.get("acct") or author.lower().replace(" ", "_")
+                handle = f"@{acct}" if not acct.startswith("@") else acct
+
+                content_html = p.get("content", "")
+                text = BeautifulSoup(content_html, "html.parser").get_text(separator=" ", strip=True)
+                if not text or len(text) < 5:
+                    continue
+
+                likes = int(p.get("favourites_count", 0)) + int(p.get("reblogs_count", 0))
+                pub_str = p.get("created_at")
+                pub_dt = datetime.utcnow()
+                if pub_str:
+                    try:
+                        pub_dt = datetime.fromisoformat(pub_str.replace("Z", "+00:00")).replace(tzinfo=None)
+                    except Exception:
+                        pass
+
+                lower_t = text.lower()
+                if any(w in lower_t for w in ["great", "awesome", "love", "amazing", "best", "brilliant", "super", "proud", "good"]):
+                    sentiment = "positive"
+                elif any(w in lower_t for w in ["why", "how", "what", "question", "does", "can", "when", "?"]):
+                    sentiment = "curious"
+                elif any(w in lower_t for w in ["bad", "wrong", "fake", "hate", "terrible", "worst", "disagree", "broken"]):
+                    sentiment = "critical"
+                else:
+                    sentiment = "neutral"
+
+                parsed_comments.append({
+                    "author": author,
+                    "author_handle": handle[:35],
+                    "author_avatar_color": random.choice(AVATAR_COLORS),
+                    "platform": "mastodon",
+                    "content": text[:400],
+                    "upvotes": max(1, likes),
+                    "sentiment": sentiment,
+                    "published_at": pub_dt
+                })
+
+            return parsed_comments if parsed_comments else None
+    except Exception as e:
+        logger.warning(f"Failed to fetch live Mastodon comments: {e}")
+        return None
+
+
+def _fetch_live_bluesky_comments_sync(item: TrendingItem, limit: int = 10) -> Optional[List[Dict[str, Any]]]:
+    """Attempt live comment/discussion fetching from Bluesky."""
+    if not (item.source and item.source.slug == "bluesky"):
+        return None
+
+    import httpx
+
+    posts = []
+    try:
+        with httpx.Client(timeout=6.0) as client:
+            jwt = None
+            if settings.BLUESKY_API_KEY and settings.BLUESKY_IDENTIFIER:
+                try:
+                    auth_r = client.post(
+                        "https://bsky.social/xrpc/com.atproto.server.createSession",
+                        json={
+                            "identifier": settings.BLUESKY_IDENTIFIER,
+                            "password": settings.BLUESKY_API_KEY
+                        },
+                        timeout=5.0
+                    )
+                    if auth_r.status_code == 200:
+                        jwt = auth_r.json().get("accessJwt")
+                except Exception as auth_err:
+                    logger.debug(f"Bluesky auth notice in comments: {auth_err}")
+
+            headers = {"User-Agent": "SocialPulse/1.0"}
+            if jwt:
+                headers["Authorization"] = f"Bearer {jwt}"
+
+            base_api = "https://bsky.social" if jwt else "https://public.api.bsky.app"
+
+            search_query = item.title or "news"
+            clean_words = re.sub(r"[^\w\s]", "", search_query).split()
+            query_str = " ".join(clean_words[:4]) if clean_words else "news"
+
+            resp = client.get(
+                f"{base_api}/xrpc/app.bsky.feed.searchPosts",
+                params={"q": query_str, "sort": "top", "limit": str(limit)},
+                headers=headers
+            )
+            if resp.status_code == 200:
+                posts = resp.json().get("posts", [])
+
+            if not posts:
+                return None
+
+            parsed_comments = []
+            for p in posts[:limit]:
+                author_info = p.get("author", {})
+                author = author_info.get("displayName") or author_info.get("handle") or "Bluesky User"
+                handle = author_info.get("handle") or "bsky.social"
+                handle_str = f"@{handle}" if not handle.startswith("@") else handle
+
+                record = p.get("record", {})
+                text = (record.get("text") or "").strip()
+                if not text or len(text) < 5:
+                    continue
+
+                likes = int(p.get("likeCount", 0)) + int(p.get("repostCount", 0))
+                pub_str = record.get("createdAt")
+                pub_dt = datetime.utcnow()
+                if pub_str:
+                    try:
+                        pub_dt = datetime.fromisoformat(pub_str.replace("Z", "+00:00")).replace(tzinfo=None)
+                    except Exception:
+                        pass
+
+                lower_t = text.lower()
+                if any(w in lower_t for w in ["great", "awesome", "love", "amazing", "best", "brilliant", "super", "proud", "good"]):
+                    sentiment = "positive"
+                elif any(w in lower_t for w in ["why", "how", "what", "question", "does", "can", "when", "?"]):
+                    sentiment = "curious"
+                elif any(w in lower_t for w in ["bad", "wrong", "fake", "hate", "terrible", "worst", "disagree", "broken"]):
+                    sentiment = "critical"
+                else:
+                    sentiment = "neutral"
+
+                parsed_comments.append({
+                    "author": author,
+                    "author_handle": handle_str[:35],
+                    "author_avatar_color": random.choice(AVATAR_COLORS),
+                    "platform": "bluesky",
+                    "content": text[:400],
+                    "upvotes": max(1, likes),
+                    "sentiment": sentiment,
+                    "published_at": pub_dt
+                })
+
+            return parsed_comments if parsed_comments else None
+    except Exception as e:
+        logger.warning(f"Failed to fetch live Bluesky comments: {e}")
+        return None
+
+
 def _fetch_live_reddit_comments_sync(item: TrendingItem, limit: int = 10) -> Optional[List[Dict[str, Any]]]:
     """Attempt live public comments fetching for Reddit threads."""
     post_id = item.external_id
@@ -493,12 +677,11 @@ def _extract_comments_from_article_sync(item: TrendingItem, limit: int = 10) -> 
 def get_or_create_item_comments(db: Session, item: TrendingItem, limit: int = 10) -> List[Comment]:
     """
     Retrieve existing comments for a TrendingItem or fetch/generate and persist them.
-    Comments are strictly restricted to YouTube (Category A official API).
-    For all other sources (Instagram, Facebook, X/Twitter, Reddit, Twitch, Mastodon,
-    Bluesky, Google Trends), comments are disabled to ensure authentic platform data.
+    Comments are supported for Category A platforms: YouTube, Mastodon, and Bluesky.
+    For all other sources, comments are disabled to ensure authentic platform data.
     """
-    # Strictly restrict comments to YouTube only
-    if not item.source or item.source.slug != "youtube":
+    # Strictly restrict comments to YouTube, Mastodon, and Bluesky
+    if not item.source or item.source.slug not in ("youtube", "mastodon", "bluesky"):
         return []
 
     existing = (
@@ -512,10 +695,17 @@ def get_or_create_item_comments(db: Session, item: TrendingItem, limit: int = 10
     if existing:
         return existing
 
-    # YouTube: fetch live comments when API key is configured, else fallback to mock YouTube comments
+    slug = item.source.slug
     raw_comments = None
-    if settings.YOUTUBE_API_KEY:
-        raw_comments = _fetch_live_youtube_comments_sync(item, limit=limit)
+    if slug == "youtube":
+        if settings.YOUTUBE_API_KEY:
+            raw_comments = _fetch_live_youtube_comments_sync(item, limit=limit)
+    elif slug == "mastodon":
+        if settings.MASTODON_API_KEY:
+            raw_comments = _fetch_live_mastodon_comments_sync(item, limit=limit)
+    elif slug == "bluesky":
+        if settings.BLUESKY_API_KEY:
+            raw_comments = _fetch_live_bluesky_comments_sync(item, limit=limit)
 
     if not raw_comments:
         raw_comments = _generate_synthetic_item_comments(item, count=limit)
@@ -527,8 +717,8 @@ def get_or_create_item_comments(db: Session, item: TrendingItem, limit: int = 10
             topic_id=item.topic_id,
             author=c_data["author"],
             author_handle=c_data["author_handle"],
-            author_avatar_color=c_data["author_avatar_color"],
-            platform="youtube",
+            author_avatar_color=c_data.get("author_avatar_color", random.choice(AVATAR_COLORS)),
+            platform=slug,
             content=c_data["content"],
             upvotes=c_data["upvotes"],
             sentiment=c_data["sentiment"],

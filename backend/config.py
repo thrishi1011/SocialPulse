@@ -46,6 +46,16 @@ class Settings:
     YOUTUBE_API_KEY: str = os.getenv("YOUTUBE_API_KEY", "").strip()
     GIPHY_API_KEY: str = os.getenv("GIPHY_API_KEY", "").strip()
 
+    # Mastodon API Configuration
+    MASTODON_API_KEY: str = (os.getenv("MASTODON_API") or os.getenv("MASTODON_ACCESS_TOKEN") or os.getenv("MASTODON_API_KEY") or "").strip()
+    MASTODON_CLIENT_KEY: str = os.getenv("MASTODON_CLIENT_KEY", "").strip()
+    MASTODON_CLIENT_SECRET: str = os.getenv("MASTODON_CLIENT_SECRET", "").strip()
+    MASTODON_BASE_URL: str = os.getenv("MASTODON_BASE_URL", "https://mastodon.social").rstrip("/")
+
+    # Bluesky / AT Protocol API Configuration
+    BLUESKY_API_KEY: str = (os.getenv("BLUESY_API") or os.getenv("BLUESKY_API") or os.getenv("BLUESKY_API_KEY") or os.getenv("BLUESKY_APP_PASSWORD") or "").strip()
+    BLUESKY_IDENTIFIER: str = (os.getenv("BLUESKY_IDENTIFIER") or os.getenv("BLUESKY_HANDLE") or "thrishanthreddygoli@gmail.com").strip()
+
     # Subreddit Curated List (Approved)
     REDDIT_SUBREDDITS: list[str] = [
         "all",

@@ -203,8 +203,8 @@ First-party data with real engagement numbers. Cards have a solid cyan border an
 | Source | Data | Notes |
 | :--- | :--- | :--- |
 | **YouTube** | Most popular videos in India (`regionCode=IN`), merged with the News & Politics category (`videoCategoryId=25`) | Needs `YOUTUBE_API_KEY` |
-| **Mastodon** | Trending hashtags from `mastodon.social` (`/api/v1/trends/tags`) | No key. Global, no regional data |
-| **Bluesky** | Trending topics from the public AppView (`app.bsky.unspecced.getTrendingTopics`) | No key. Global, no regional data |
+| **Mastodon** | Trending news articles (`/api/v1/trends/links`), hashtags (`/api/v1/trends/tags`), and viral statuses (`/api/v1/trends/statuses`) | Uses `MASTODON_API` key (Bearer auth), global federated |
+| **Bluesky** | Trending topics and top news discussions from AT Protocol API (`app.bsky.unspecced.getTrendingTopics` & `searchPosts`) | Uses `BLUESY_API` / `BLUESKY_API_KEY` session authentication |
 
 ### Category B: Derived signals (6 sources)
 
@@ -251,6 +251,8 @@ All settings are environment variables, read from `.env` (copy `.env.example`).
 | `GEMINI_KEY` | empty | Google Gemini API key for AI summaries and clustering. |
 | `GEMINI_KEY_SCRAP` | empty | Optional secondary Gemini API key specifically for Category B news discovery and fallback enrichment, isolating news scraping from core AI quotas. |
 | `YOUTUBE_API_KEY` | empty | YouTube Data API v3 key. Without it YouTube falls back to sample data. |
+| `MASTODON_API` | empty | Mastodon API Bearer token for authenticating trends/links and federated reactions. |
+| `BLUESY_API` | empty | Bluesky / AT Protocol API password for session authentication and top discussions. |
 | `DATABASE_URL` | empty | PostgreSQL URL for persistent history. Empty uses local SQLite. |
 | `DB_PATH` | `socialpulse.db` | SQLite file name when `DATABASE_URL` is empty. |
 | `PIPELINE_INTERVAL_MINUTES` | `15` | Defined in config, but the scheduler uses each source's own interval from the database. |
@@ -363,7 +365,7 @@ Interactive documentation is at `/docs`. All paths are under `/api/v1` unless no
 | `GET` | `/trends` | List items. Filters: `source` (repeatable), `source_category` (A/B), `category`, `recency` (6h/12h/24h/all), `region_scope` (all/india/global/local), `sort` (recency/engagement/momentum), `page`, `per_page` |
 | `GET` | `/trends/{id}` | Full item details with trending region and momentum |
 | `GET` | `/trends/{id}/history` | Snapshot series (rank and engagement over time) |
-| `GET` | `/trends/{id}/comments` | Sourced real community comments and sentiment breakdown for YouTube trending items |
+| `GET` | `/trends/{id}/comments` | Sourced real community comments and sentiment breakdown for YouTube, Mastodon, and Bluesky trending items |
 | `GET` | `/trends/export.csv` | CSV export using the same filters as `/trends` |
 | `GET` | `/topics` | Macro stories. Params: `min_sources` (default 2), `recency` |
 | `GET` | `/topics/{id}` | One story with all member items |

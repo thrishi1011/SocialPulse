@@ -423,7 +423,7 @@ def get_item_comments(
     if not item:
         raise HTTPException(status_code=404, detail=f"Trending item with ID {item_id} not found.")
 
-    if not item.source or item.source.slug != "youtube":
+    if not item.source or item.source.slug not in ("youtube", "mastodon", "bluesky"):
         return format_comments_response([])
 
     comments = get_or_create_item_comments(db, item, limit=limit)

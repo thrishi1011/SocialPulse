@@ -485,14 +485,32 @@ async function openDetailDrawer(itemId) {
   try {
     const item = await api.getTrendById(itemId);
     const isCatA = item.source_category === "A";
-    const isYouTube = item.source && item.source.slug === "youtube";
+    const sourceSlug = item.source ? item.source.slug : "";
+    const hasComments = ["youtube", "mastodon", "bluesky"].includes(sourceSlug);
 
     const [history, commentsData] = await Promise.all([
       api.getTrendHistory(itemId).catch(() => ({ snapshots: [] })),
-      isYouTube
+      hasComments
         ? api.getItemComments(itemId, 10).catch(() => ({ total: 0, comments: [], sentiment_breakdown: {} }))
         : Promise.resolve({ total: 0, comments: [], sentiment_breakdown: {} })
     ]);
+
+    let commentsSectionTitle = "💬 Community Comments";
+    let commentsCountLabel = "comments";
+    let commentsEmptyNotice = "No community comments recorded for this item yet.";
+    if (sourceSlug === "youtube") {
+      commentsSectionTitle = "💬 YouTube Community Comments";
+      commentsCountLabel = "comments";
+      commentsEmptyNotice = "No comments available for this video.";
+    } else if (sourceSlug === "mastodon") {
+      commentsSectionTitle = "💬 Mastodon Federated Reactions";
+      commentsCountLabel = "reactions";
+      commentsEmptyNotice = "No federated reactions recorded for this topic yet.";
+    } else if (sourceSlug === "bluesky") {
+      commentsSectionTitle = "💬 Bluesky Network Discussions";
+      commentsCountLabel = "discussions";
+      commentsEmptyNotice = "No network discussions recorded for this topic yet.";
+    }
 
     let provenanceDescription = "";
     let ctaButtonCopy = `View on ${escapeHTML(item.source.display_name)} →`;
@@ -582,13 +600,13 @@ async function openDetailDrawer(itemId) {
         `}
       </div>
 
-      <!-- Sourced Community Reactions & Comments Section (YouTube Only) -->
-      ${isYouTube ? `
+      <!-- Sourced Community Reactions & Comments Section (Category A: YouTube, Mastodon, Bluesky) -->
+      ${hasComments ? `
         <div class="drawer-comments-section">
           <div class="drawer-comments-header">
             <div class="drawer-comments-title-wrap">
-              <span class="drawer-comments-title">💬 YouTube Community Comments</span>
-              <span class="comments-count-pill">${commentsData.total || 0} comments</span>
+              <span class="drawer-comments-title">${commentsSectionTitle}</span>
+              <span class="comments-count-pill">${commentsData.total || 0} ${commentsCountLabel}</span>
             </div>
             <div class="comments-sentiment-strip">
               ${renderSentimentBreakdownHTML(commentsData.sentiment_breakdown, commentsData.total)}
@@ -597,7 +615,7 @@ async function openDetailDrawer(itemId) {
           <div class="drawer-comments-list">
             ${commentsData.comments && commentsData.comments.length > 0
               ? commentsData.comments.map(c => renderCommentCardHTML(c)).join("")
-              : `<div class="comments-empty-notice">No comments available for this video.</div>`
+              : `<div class="comments-empty-notice">${commentsEmptyNotice}</div>`
             }
           </div>
         </div>

@@ -4,12 +4,13 @@ test_comments.py
 Comprehensive test suite verifying:
 1. Comment database model creation, columns, and foreign key relationships.
 2. comments_service item comment generation, persistence, and sentiment breakdown.
-3. comments_service macro topic cross-platform comment aggregation.
-4. Router endpoint handlers:
+3. Category A support for YouTube, Mastodon, and Bluesky.
+4. comments_service macro topic cross-platform comment aggregation.
+5. Router endpoint handlers:
    - get_item_comments(item_id, limit, db)
    - get_topic_comments(topic_id, limit, db)
-5. 404 HTTPException handling for non-existent items and topics.
-6. Multi-platform attribution and sentiment consistency.
+6. 404 HTTPException handling for non-existent items and topics.
+7. Verification that non-supported platforms (e.g. Reddit) return 0 comments.
 """
 import pytest
 from datetime import datetime, timedelta
@@ -41,6 +42,16 @@ def db_session():
         source_category="A", source_type_label="Official API",
         fetch_interval_min=15, is_enabled=True
     )
+    src_mastodon = Source(
+        slug="mastodon", display_name="Mastodon",
+        source_category="A", source_type_label="Official API",
+        fetch_interval_min=15, is_enabled=True
+    )
+    src_bluesky = Source(
+        slug="bluesky", display_name="Bluesky",
+        source_category="A", source_type_label="Official API",
+        fetch_interval_min=15, is_enabled=True
+    )
     src_reddit = Source(
         slug="reddit", display_name="Reddit",
         source_category="A", source_type_label="Official API",
@@ -48,10 +59,10 @@ def db_session():
     )
     cat_tech = Category(name="Technology", color="#3b82f6")
 
-    session.add_all([src_yt, src_reddit, cat_tech])
+    session.add_all([src_yt, src_mastodon, src_bluesky, src_reddit, cat_tech])
     session.commit()
 
-    # Seed test item
+    # Seed test item (YouTube)
     item = TrendingItem(
         source_id=src_yt.id,
         category_id=cat_tech.id,
@@ -104,6 +115,68 @@ def test_comment_model_and_item_generation(db_session):
     second_call = get_or_create_item_comments(db_session, item, limit=5)
     assert len(second_call) == 5
     assert [c.id for c in second_call] == [c.id for c in comments]
+
+
+def test_mastodon_item_comments(db_session):
+    src_masto = db_session.query(Source).filter(Source.slug == "mastodon").first()
+    cat = db_session.query(Category).first()
+
+    item_masto = TrendingItem(
+        source_id=src_masto.id,
+        category_id=cat.id,
+        external_id="tag_technology",
+        title="#Technology",
+        description="Trending technology discussions across federated servers.",
+        url="https://mastodon.social/tags/technology",
+        source_category="A",
+        fetched_at=datetime.utcnow()
+    )
+    db_session.add(item_masto)
+    db_session.commit()
+
+    comments = get_or_create_item_comments(db_session, item_masto, limit=5)
+    assert len(comments) > 0
+    assert len(comments) <= 5
+    for c in comments:
+        assert c.item_id == item_masto.id
+        assert c.platform == "mastodon"
+        assert c.author
+        assert c.content
+
+    resp = get_item_comments(item_id=item_masto.id, db=db_session)
+    assert resp.total == len(comments)
+    assert len(resp.comments) == len(comments)
+
+
+def test_bluesky_item_comments(db_session):
+    src_bsky = db_session.query(Source).filter(Source.slug == "bluesky").first()
+    cat = db_session.query(Category).first()
+
+    item_bsky = TrendingItem(
+        source_id=src_bsky.id,
+        category_id=cat.id,
+        external_id="bsky_artificial_intelligence",
+        title="Artificial Intelligence",
+        description="Trending conversations about AI breakthroughs.",
+        url="https://bsky.app/search?q=Artificial%20Intelligence",
+        source_category="A",
+        fetched_at=datetime.utcnow()
+    )
+    db_session.add(item_bsky)
+    db_session.commit()
+
+    comments = get_or_create_item_comments(db_session, item_bsky, limit=5)
+    assert len(comments) > 0
+    assert len(comments) <= 5
+    for c in comments:
+        assert c.item_id == item_bsky.id
+        assert c.platform == "bluesky"
+        assert c.author
+        assert c.content
+
+    resp = get_item_comments(item_id=item_bsky.id, db=db_session)
+    assert resp.total == len(comments)
+    assert len(resp.comments) == len(comments)
 
 
 def test_topic_comment_generation(db_session):
@@ -197,7 +270,7 @@ def test_top_10_comments_retrieval(db_session):
     assert len(response.comments) == 10
 
 
-def test_non_youtube_item_returns_zero_comments(db_session):
+def test_non_category_a_item_returns_zero_comments(db_session):
     src_reddit = db_session.query(Source).filter(Source.slug == 'reddit').first()
     item_reddit = TrendingItem(
         source_id=src_reddit.id,
@@ -211,7 +284,7 @@ def test_non_youtube_item_returns_zero_comments(db_session):
     db_session.add(item_reddit)
     db_session.commit()
 
-    # Comments are strictly restricted to YouTube only
+    # Comments are restricted to Category A social platforms: YouTube, Mastodon, and Bluesky
     raw_comments = get_or_create_item_comments(db_session, item_reddit, limit=10)
     assert len(raw_comments) == 0
 
